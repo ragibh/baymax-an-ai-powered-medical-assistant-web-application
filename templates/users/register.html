@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <!-- Cute Header -->
+            <div class="text-center mb-4">
+                <img src="{% static 'images/baymax1.png' %}" alt="Baymax" style="height: 80px;" class="mb-3">
+                <h3 class="fw-bold" style="color: #FF6B6B;">Join Baymax! 🌟</h3>
+                <p class="text-muted">Let's start your health adventure together</p>
+            </div>
+
+            <!-- Simple Registration Card -->
+            <div class="card shadow-sm border-0" style="border-radius: 20px; background: #f8f9fa;">
+                <div class="card-body p-4">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <!-- Username & Email -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label small fw-bold">Username</label>
+                                {{ form.username }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label small fw-bold">Email</label>
+                                {{ form.email }}
+                            </div>
+                        </div>
+
+                        <!-- Passwords -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label small fw-bold">Password</label>
+                                {{ form.password1 }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label small fw-bold">Confirm</label>
+                                {{ form.password2 }}
+                            </div>
+                        </div>
+
+                        <!-- Optional Fields -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label small fw-bold">Phone <small class="text-muted">(optional)</small></label>
+                                {{ form.phone }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label small fw-bold">Age <small class="text-muted">(optional)</small></label>
+                                {{ form.age }}
+                            </div>
+                        </div>
+
+                        <!-- Address -->
+                        <div class="mb-4">
+                            <label class="form-label small fw-bold">Address <small class="text-muted">(optional)</small></label>
+                            {{ form.address }}
+                        </div>
+
+                        <!-- Register Button -->
+                        <button type="submit" class="btn btn-success w-100 py-2 fw-bold" 
+                                style="border-radius: 15px; background: #28A745; border: none;">
+                            <i class="fas fa-user-plus me-2"></i>Create Account
+                        </button>
+                    </form>
+
+                    <!-- Login Link -->
+                    <div class="text-center mt-3">
+                        <small class="text-muted">
+                            Already have an account? 
+                            <a href="{% url 'users:login' %}" class="text-decoration-none" style="color: #FF6B6B;">
+                                Login here
+                            </a>
+                        </small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Benefits -->
+            <div class="text-center mt-4">
+                <div class="row">
+                    <div class="col-4">
+                        <small><i class="fas fa-shield-alt text-primary"></i> Secure</small>
+                    </div>
+                    <div class="col-4">
+                        <small><i class="fas fa-robot text-info"></i> AI Powered</small>
+                    </div>
+                    <div class="col-4">
+                        <small><i class="fas fa-heart text-danger"></i> Caring</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    input, textarea {
+        width: 100%;
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        font-size: 14px;
+    }
+    
+    input:focus, textarea:focus {
+        border-color: #FF6B6B;
+        box-shadow: 0 0 0 2px rgba(255, 107, 107, 0.1);
+    }
+    
+    .card {
+        border: 2px solid rgba(255, 107, 107, 0.1);
+    }
+    
+    textarea {
+        min-height: 60px;
+        resize: vertical;
+    }
+</style>
+{% endblock %}

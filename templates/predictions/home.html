@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Health Predictions</h2>
+    <p class="lead">Select a prediction type to get started:</p>
+    
+    <div class="row">
+        <!-- BMI Prediction -->
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 text-center">
+                <div class="card-body">
+                    <i class="fas fa-weight fa-3x text-primary mb-3"></i>
+                    <h5 class="card-title">BMI Prediction</h5>
+                    <p class="card-text">Calculate your Body Mass Index and get health insights.</p>
+                    <a href="{% url 'predictions:bmi' %}" class="btn btn-primary">Calculate BMI</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Diabetes Prediction -->
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 text-center">
+                <div class="card-body">
+                    <i class="fas fa-syringe fa-3x text-warning mb-3"></i>
+                    <h5 class="card-title">Diabetes Prediction</h5>
+                    <p class="card-text">Assess your risk of diabetes using AI analysis.</p>
+                    <a href="{% url 'predictions:diabetes' %}" class="btn btn-warning">Check Risk</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Heart Disease Prediction -->
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 text-center">
+                <div class="card-body">
+                    <i class="fas fa-heart fa-3x text-danger mb-3"></i>
+                    <h5 class="card-title">Heart Disease</h5>
+                    <p class="card-text">Evaluate your heart health and potential risks.</p>
+                    <a href="{% url 'predictions:heart' %}" class="btn btn-danger">Assess Heart</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mt-4">
+        <!-- Coming Soon Features -->
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 text-center">
+                <div class="card-body">
+                    <i class="fas fa-liver fa-3x text-info mb-3"></i>
+                    <h5 class="card-title">Liver Disease</h5>
+                    <p class="card-text">Liver health assessment (Coming Soon)</p>
+                    <button class="btn btn-info" disabled>Coming Soon</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 text-center">
+                <div class="card-body">
+                    <i class="fas fa-kidneys fa-3x text-success mb-3"></i>
+                    <h5 class="card-title">Kidney Disease</h5>
+                    <p class="card-text">Kidney function analysis (Coming Soon)</p>
+                    <button class="btn btn-success" disabled>Coming Soon</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 text-center">
+                <div class="card-body">
+                    <i class="fas fa-prescription fa-3x text-secondary mb-3"></i>
+                    <h5 class="card-title">Prescription Reader</h5>
+                    <p class="card-text">Read handwritten prescriptions (Coming Soon)</p>
+                    <button class="btn btn-secondary" disabled>Coming Soon</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,535 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm border-0" style="border-radius: 25px; background: linear-gradient(135deg, #e3f2fd, #f3e5f5);">
+                <div class="card-body text-center p-4">
+                    <div class="d-flex align-items-center justify-content-center mb-3">
+                        <img src="{% static 'images/baymax2.png' %}" alt="Baymax" style="height: 60px;" class="me-3">
+                        <div>
+                            <h2 class="mb-1" style="color: #FF6B6B;">🏥 Doctor Directory</h2>
+                            <p class="mb-0 text-muted">Find the right healthcare professional near you! 💖</p>
+                        </div>
+                    </div>
+                    <!-- Update the statistics cards -->
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="stat-card">
+                                <h4 class="text-primary mb-1">{{ total_doctors }}+</h4>
+                                <small>Verified Doctors</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-card">
+                                <h4 class="text-success mb-1">{{ total_divisions }}+</h4>
+                                <small>Divisions</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-card">
+                                <h4 class="text-warning mb-1">{{ total_districts }}+</h4>
+                                <small>Districts</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-card">
+                                <h4 class="text-info mb-1">{{ total_departments }}+</h4>
+                                <small>Specialties</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm border-0" style="border-radius: 20px;">
+                <div class="card-header border-0 text-white" style="background: linear-gradient(135deg, #4facfe, #00f2fe); border-radius: 20px 20px 0 0;">
+                    <h5 class="mb-0">🔍 Find Your Doctor</h5>
+                </div>
+                <div class="card-body">
+                    <form method="get" id="filter-form">
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <label class="form-label small fw-bold">🏛️ Division</label>
+                                <select name="division" class="form-select" id="division-select">
+                                    <option value="">All Divisions</option>
+                                    {% for division in divisions %}
+                                    <option value="{{ division }}" {% if current_division == division %}selected{% endif %}>
+                                        {{ division }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small fw-bold">🗺️ District</label>
+                                <select name="district" class="form-select" id="district-select">
+                                    <option value="">All Districts</option>
+                                    {% for district in districts %}
+                                    <option value="{{ district }}" {% if current_district == district %}selected{% endif %}>
+                                        {{ district }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small fw-bold">🎯 Specialty</label>
+                                <select name="department" class="form-select" id="department-select">
+                                    <option value="">All Specialties</option>
+                                    {% for department in departments %}
+                                    <option value="{{ department }}" {% if current_department == department %}selected{% endif %}>
+                                        {{ department }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small fw-bold">🔎 Search</label>
+                                <div class="input-group">
+                                    <input type="text" name="search" class="form-control" placeholder="Doctor, hospital..." value="{{ current_search }}">
+                                    <button type="submit" class="btn btn-primary">Search</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Quick Emergency Specialties -->
+                        <div class="mt-3">
+                            <label class="form-label small fw-bold">🚑 Quick Specialties</label>
+                            <div class="d-flex flex-wrap gap-2 mb-3">
+                                <button type="button" class="btn btn-outline-danger btn-sm quick-specialty" data-dept="Cardiology">
+                                    ❤️ Heart Specialist
+                                </button>
+                                <button type="button" class="btn btn-outline-primary btn-sm quick-specialty" data-dept="Neurology">
+                                    🧠 Neurologist
+                                </button>
+                                <button type="button" class="btn btn-outline-success btn-sm quick-specialty" data-dept="Pediatrics">
+                                    👶 Pediatrician
+                                </button>
+                                <button type="button" class="btn btn-outline-warning btn-sm quick-specialty" data-dept="Dentistry">
+                                    🦷 Dentist
+                                </button>
+                                <button type="button" class="btn btn-outline-info btn-sm quick-specialty" data-dept="Orthopedics">
+                                    🦴 Orthopedic
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary btn-sm quick-specialty" data-dept="Gynecology">
+                                    👩‍⚕️ Gynecologist
+                                </button>
+                            </div>
+                        </div>
+                        
+                        {% if current_division or current_district or current_department or current_search %}
+                        <div class="mt-3">
+                            <a href="{% url 'emergency:directory' %}" class="btn btn-sm btn-outline-secondary">
+                                🗑️ Clear All Filters
+                            </a>
+                            <small class="text-muted ms-2">
+                                Showing {{ doctors.count }} of {{ total_doctors }} doctors
+                            </small>
+                        </div>
+                        {% endif %}
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Doctors Grid -->
+    <div class="row">
+        {% for doctor in doctors %}
+        <div class="col-xl-4 col-lg-6 col-md-6 mb-4">
+            <div class="card doctor-card h-100 shadow-sm border-0" style="border-radius: 20px; transition: all 0.3s ease;">
+                <div class="card-body">
+                    <!-- Doctor Header -->
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <h6 class="card-title mb-1 text-primary">{{ doctor.provider }}</h6>
+                            <small class="text-muted">{{ doctor.post }} • {{ doctor.professional }}</small>
+                        </div>
+                        <span class="badge bg-success">✅ Verified</span>
+                    </div>
+
+                    <!-- Doctor Info -->
+                    <div class="doctor-info mb-3">
+                        <div class="info-item mb-2">
+                            <span class="info-icon">🎓</span>
+                            <small><strong>{{ doctor.degree }}</strong> in {{ doctor.department }}</small>
+                        </div>
+                        <div class="info-item mb-2">
+                            <span class="info-icon">🏥</span>
+                            <small>{{ doctor.hospital_name|default:doctor.address|truncatewords:8 }}</small>
+                        </div>
+                        <div class="info-item mb-2">
+                            <span class="info-icon">📍</span>
+                            <small>{{ doctor.district }}, {{ doctor.division }}</small>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="doctor-actions">
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <a href="tel:{{ doctor.contact_no }}" class="btn btn-success btn-sm w-100">
+                                    📞 Call
+                                </a>
+                            </div>
+                            <div class="col-6">
+                                <button class="btn btn-primary btn-sm w-100 view-doctor-btn" 
+                                        data-doctor-id="{{ doctor.id }}">
+                                    ℹ️ Details
+                                </button>
+                            </div>
+                            <div class="col-12 mt-2">
+                                <a href="{{ doctor.get_map_url }}" target="_blank" class="btn btn-outline-info btn-sm w-100">
+                                    🗺️ View on Map
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="card text-center py-5" style="border-radius: 20px; background: linear-gradient(135deg, #fff0f0, #fff);">
+                <img src="{% static 'images/baymax1.png' %}" alt="Baymax" style="height: 100px;" class="mb-3">
+                <h5 class="text-muted">No doctors found</h5>
+                <p class="text-muted">Try adjusting your filters or search terms</p>
+                <a href="{% url 'emergency:directory' %}" class="btn btn-primary">Show All Doctors</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Load More Section -->
+    {% if doctors.count > 12 %}
+    <div class="row mt-4">
+        <div class="col-12 text-center">
+            <button class="btn btn-outline-primary" id="load-more-btn">
+                📚 Load More Doctors
+            </button>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Doctor Details Modal -->
+<div class="modal fade" id="doctorModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content" style="border-radius: 20px;">
+            <div class="modal-header" style="background: linear-gradient(135deg, #FF6B6B, #FFB6C1); border-radius: 20px 20px 0 0;">
+                <h5 class="modal-title text-white">👨‍⚕️ Doctor Details</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="doctorModalBody">
+                <!-- Content loaded via AJAX -->
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Doctor card hover effects
+document.querySelectorAll('.doctor-card').forEach(card => {
+    card.addEventListener('mouseenter', function() {
+        this.style.transform = 'translateY(-5px)';
+        this.style.boxShadow = '0 10px 25px rgba(0,0,0,0.1)';
+    });
+    
+    card.addEventListener('mouseleave', function() {
+        this.style.transform = 'translateY(0)';
+        this.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
+    });
+});
+
+// View doctor details
+document.querySelectorAll('.view-doctor-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const doctorId = this.getAttribute('data-doctor-id');
+        
+        fetch(`{% url 'emergency:doctor_details' 0 %}`.replace('0', doctorId))
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert('Error loading doctor details');
+                    return;
+                }
+                
+                const modalBody = document.getElementById('doctorModalBody');
+                modalBody.innerHTML = `
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>👨‍⚕️ ${data.provider}</h6>
+                            <p class="mb-1"><strong>Post:</strong> ${data.post}</p>
+                            <p class="mb-1"><strong>Professional:</strong> ${data.professional}</p>
+                            <p class="mb-1"><strong>Degree:</strong> ${data.degree}</p>
+                            <p class="mb-1"><strong>Department:</strong> ${data.department}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>📍 Location</h6>
+                            <p class="mb-1"><strong>Division:</strong> ${data.division}</p>
+                            <p class="mb-1"><strong>District:</strong> ${data.district}</p>
+                            <p class="mb-1"><strong>Upazila:</strong> ${data.upazila}</p>
+                            <p class="mb-2"><strong>Address:</strong> ${data.address}</p>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <h6>📞 Contact & Navigation</h6>
+                            <div class="d-grid gap-2">
+                                <a href="tel:${data.contact_no}" class="btn btn-success">
+                                    📞 Call: ${data.contact_no}
+                                </a>
+                                <a href="${data.map_url}" target="_blank" class="btn btn-outline-primary">
+                                    🗺️ View on Map
+                                </a>
+                                <a href="${data.directions_url}" target="_blank" class="btn btn-outline-info">
+                                    🧭 Get Directions
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                new bootstrap.Modal(document.getElementById('doctorModal')).show();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error loading doctor details');
+            });
+    });
+});
+
+// ============ DYNAMIC FILTERING ============
+document.getElementById('division-select').addEventListener('change', function() {
+    const division = this.value;
+    
+    if (division) {
+        // Show loading
+        document.getElementById('district-select').innerHTML = '<option value="">Loading districts...</option>';
+        document.getElementById('department-select').innerHTML = '<option value="">Loading specialties...</option>';
+        
+        fetch(`{% url 'emergency:filter_options' %}?division=${encodeURIComponent(division)}`)
+            .then(response => response.json())
+            .then(data => {
+                // Update district select
+                const districtSelect = document.getElementById('district-select');
+                districtSelect.innerHTML = '<option value="">All Districts</option>';
+                if (data.districts && data.districts.length > 0) {
+                    data.districts.forEach(district => {
+                        if (district && district.trim() !== '') {
+                            districtSelect.innerHTML += `<option value="${district}">${district}</option>`;
+                        }
+                    });
+                }
+                
+                // Update department select
+                const departmentSelect = document.getElementById('department-select');
+                departmentSelect.innerHTML = '<option value="">All Specialties</option>';
+                if (data.departments && data.departments.length > 0) {
+                    data.departments.forEach(dept => {
+                        if (dept && dept.trim() !== '') {
+                            departmentSelect.innerHTML += `<option value="${dept}">${dept}</option>`;
+                        }
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error loading filter options:', error);
+                // Reset on error
+                document.getElementById('district-select').innerHTML = '<option value="">All Districts</option>';
+                document.getElementById('department-select').innerHTML = '<option value="">All Specialties</option>';
+            });
+    } else {
+        // If no division selected, reset to all options
+        document.getElementById('district-select').innerHTML = '<option value="">All Districts</option>';
+        document.getElementById('department-select').innerHTML = '<option value="">All Specialties</option>';
+    }
+});
+
+// Auto-submit form on filter change (except division which uses dynamic filtering)
+document.getElementById('district-select').addEventListener('change', function() {
+    document.getElementById('filter-form').submit();
+});
+
+document.getElementById('department-select').addEventListener('change', function() {
+    document.getElementById('filter-form').submit();
+});
+
+// Quick specialty buttons
+document.querySelectorAll('.quick-specialty').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const specialty = this.getAttribute('data-dept');
+        document.getElementById('department-select').value = specialty;
+        document.getElementById('filter-form').submit();
+    });
+});
+
+// Load more functionality
+document.getElementById('load-more-btn')?.addEventListener('click', function() {
+    const currentUrl = new URL(window.location.href);
+    const currentPage = parseInt(currentUrl.searchParams.get('page') || '1');
+    currentUrl.searchParams.set('page', (currentPage + 1).toString());
+    window.location.href = currentUrl.toString();
+});
+
+// Quick location buttons
+const popularLocations = [
+    {text: '🏙️ Dhaka', division: 'Dhaka'},
+    {text: '🌊 Chittagong', division: 'Chittagong'},
+    {text: '🎨 Rajshahi', division: 'Rajshahi'},
+    {text: '🚢 Khulna', division: 'Khulna'},
+];
+
+// Add popular locations if needed
+// const filterContainer = document.querySelector('.card-body');
+// const locationButtons = document.createElement('div');
+// locationButtons.className = 'mt-3';
+// locationButtons.innerHTML = `
+//     <label class="form-label small fw-bold">📍 Popular Locations</label>
+//     <div class="d-flex flex-wrap gap-2">
+//         ${popularLocations.map(loc => `
+//             <button type="button" class="btn btn-outline-primary btn-sm quick-location" data-division="${loc.division}">
+//                 ${loc.text}
+//             </button>
+//         `).join('')}
+//     </div>
+// `;
+// filterContainer.appendChild(locationButtons);
+
+// Quick location buttons functionality
+document.querySelectorAll('.quick-location').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const division = this.getAttribute('data-division');
+        document.getElementById('division-select').value = division;
+        // Trigger the change event to load districts and departments
+        document.getElementById('division-select').dispatchEvent(new Event('change'));
+    });
+});
+
+// Initialize tooltips
+var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl)
+});
+</script>
+
+<style>
+.doctor-card:hover {
+    transform: translateY(-5px);
+    transition: all 0.3s ease;
+}
+
+.stat-card {
+    background: white;
+    padding: 15px;
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: 0 2px 10px rgba(161, 60, 60, 0.1);
+    margin-bottom: 10px;
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    padding: 2px 0;
+}
+
+.info-icon {
+    margin-right: 8px;
+    font-size: 1.1em;
+    min-width: 20px;
+}
+
+.doctor-actions .btn {
+    border-radius: 10px;
+    font-size: 0.8rem;
+    margin-bottom: 5px;
+}
+
+.quick-specialty, .quick-location {
+    border-radius: 20px;
+    font-size: 0.75rem;
+    transition: all 0.3s ease;
+}
+
+.quick-specialty:hover, .quick-location:hover {
+    transform: translateY(-2px);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .doctor-card {
+        margin-bottom: 1rem;
+    }
+    
+    .stat-card {
+        margin-bottom: 1rem;
+    }
+    
+    .quick-specialty, .quick-location {
+        font-size: 0.7rem;
+        padding: 4px 8px;
+    }
+}
+
+/* Smooth animations */
+.card {
+    transition: all 0.3s ease;
+}
+
+.btn {
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+}
+
+/* Loading animation */
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+.loading {
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* Badge styles */
+.badge {
+    font-size: 0.7rem;
+    padding: 4px 8px;
+}
+
+/* Modal styles */
+.modal-content {
+    border: none;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.modal-header {
+    border-bottom: 1px solid rgba(255,255,255,0.2);
+}
+
+/* Custom scrollbar for selects */
+.form-select {
+    border-radius: 10px;
+    border: 1px solid #e0e0e0;
+}
+
+.form-select:focus {
+    border-color: #4facfe;
+    box-shadow: 0 0 0 0.2rem rgba(79, 172, 254, 0.25);
+}
+</style>
+{% endblock %}
