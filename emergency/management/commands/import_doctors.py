@@ -17,15 +17,17 @@ class Command(BaseCommand):
         return text.title()
     
     def clean_phone(self, phone):
-        """Clean phone number"""
+        """Clean phone number — store local 01XXXXXXXXX for BD."""
         if not phone:
             return ''
-        # Remove non-digit characters
         phone = re.sub(r'\D', '', phone)
-        # Ensure it starts with country code if needed
-        if phone and not phone.startswith('0') and not phone.startswith('880'):
-            phone = '0' + phone
-        return phone[:11]  # Keep to reasonable length
+        if phone.startswith('880') and len(phone) >= 13:
+            phone = '0' + phone[3:13]
+        elif phone.startswith('01') and len(phone) >= 11:
+            phone = phone[:11]
+        elif phone and not phone.startswith('0'):
+            phone = '0' + phone[:10]
+        return phone[:11]
     
     def handle(self, *args, **options):
         csv_file_path = os.path.join(settings.BASE_DIR, 'data', 'bangladesh_doctors.csv')

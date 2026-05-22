@@ -5,7 +5,7 @@ import random
 
 logger = logging.getLogger(__name__)
 
-SYSTEM_PROMPT = """You are Baymax — a warm, intelligent AI health companion from Big Hero 6. 
+SYSTEM_PROMPT = """You are Blobax — a warm, intelligent AI health companion from Big Hero 6. 
 You speak like a real doctor who genuinely cares about patients. You are calm, empathetic, and professional.
 
 YOUR PERSONALITY:
@@ -68,11 +68,11 @@ class GeminiService:
                 )
             )
 
-            # Start a persistent chat session so Baymax remembers conversation context
+            # Start a persistent chat session so Blobax remembers conversation context
             self.chat_session = self.model.start_chat(history=[])
 
             self.setup_complete = True
-            logger.info(f"✅ Baymax ready with {self.model_name}")
+            logger.info(f"✅ Blobax ready with {self.model_name}")
 
         except Exception as e:
             logger.error(f"❌ Gemini init failed: {e}")
@@ -88,7 +88,7 @@ class GeminiService:
 
         try:
             # If history is passed, create a fresh session with that history
-            # so Baymax remembers the conversation context
+            # so Blobax remembers the conversation context
             if conversation_history:
                 session = self.model.start_chat(history=conversation_history)
             else:

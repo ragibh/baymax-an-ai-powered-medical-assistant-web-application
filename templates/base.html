@@ -3,132 +3,123 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Baymax - Your AI Health Assistant</title>
-
-    <!-- Bootstrap CSS -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>{% block title %}Blobax — AI Health Assistant{% endblock %}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    <!-- FontAwesome -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-
-    <!-- Poppins Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-    <!-- Custom CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/splitting/dist/splitting.css" rel="stylesheet">
     <link href="{% static 'css/style.css' %}" rel="stylesheet">
-
-    <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #FDFDFD;
-        }
-
-        /* Navbar */
-        .navbar {
-            background: linear-gradient(135deg, #D0EBFF, #FFE5D9);
-        }
-
-        .navbar-brand img {
-            width: 50px;
-            margin-right: 10px;
-        }
-
-        .navbar-nav .nav-link {
-            margin-right: 15px;
-            font-weight: 500;
-            color: #1E3A8A;
-        }
-
-        .navbar-nav .nav-link:hover {
-            color: #FF6B6B !important;
-        }
-
-        /* Footer */
-        footer {
-            border-top-left-radius: 15px;
-            border-top-right-radius: 15px;
-            background: linear-gradient(135deg, #E2F0CB, #FFE5D9);
-            color: #1E3A8A;
-        }
-
-        /* Rounded Cards */
-        .card {
-            border-radius: 20px;
-            transition: transform 0.3s;
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-        }
-
-        /* Buttons */
-        .btn-lg {
-            border-radius: 30px;
-            transition: transform 0.2s;
-        }
-
-        .btn-lg:hover {
-            transform: scale(1.05);
-        }
-
-        /* Smooth Scroll */
-        html {
-            scroll-behavior: smooth;
-        }
-
-        h2 {
-            font-family: 'Poppins', sans-serif;
-            font-weight: 700;
-        }
-    </style>
+    {% block extra_css %}{% endblock %}
 </head>
-<body>
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-light sticky-top shadow-sm">
-        <div class="container">
-            <a class="navbar-brand" href="{% url 'home' %}">
-                <img src="{% static 'images/baymax1.png' %}" alt="Baymax Logo"> Baymax
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
+<body class="bx-body d-flex flex-column {% block body_class %}{% endblock %}">
 
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'home' %}#about">About</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'home' %}#features">Features</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'home' %}#stats">Stats</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'home' %}#contact">Contact</a></li>
-                </ul>
+<div id="bx-cursor" class="bx-cursor" aria-hidden="true">
+    <div class="bx-cursor-dot"></div>
+    <div class="bx-cursor-ring"></div>
+</div>
 
-                <ul class="navbar-nav">
-                    {% if user.is_authenticated %}
-                        <li class="nav-item"><a class="nav-link" href="{% url 'dashboard:profile' %}">Profile</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{% url 'users:logout' %}">Logout</a></li>
-                    {% else %}
-                        <li class="nav-item"><a class="nav-link" href="{% url 'users:login' %}">Login</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{% url 'users:register' %}">Register</a></li>
-                    {% endif %}
-                </ul>
-            </div>
+<div id="bx-preloader" class="bx-preloader">
+    <div class="bx-preloader-panel" style="left:0;width:50%"></div>
+    <div class="bx-preloader-panel" style="right:0;width:50%"></div>
+    <div class="bx-preloader-inner">
+        <div class="bx-preloader-logo">Blobax</div>
+        <div class="bx-preloader-bar-wrap">
+            <div class="bx-preloader-bar"><div class="bx-preloader-fill"></div></div>
+            <span class="bx-preloader-pct">0%</span>
         </div>
-    </nav>
+    </div>
+</div>
 
-    <!-- Main Content -->
-    <main>
-        {% block content %}{% endblock %}
-    </main>
-
-    <!-- Footer -->
-    <footer class="text-center py-4 mt-5">
-        <div class="container">
-            <p>&copy; 2025 Baymax - Your AI Health Assistant. Created by <strong>Ragib Hasan</strong></p>
+<nav class="navbar navbar-expand-lg bx-nav sticky-top">
+    <div class="container">
+        <a class="navbar-brand bx-brand" href="{% url 'home' %}">
+            <img src="{% static 'images/blobax1.png' %}" alt="" onerror="this.style.display='none'">
+            Blobax<span class="bx-brand-dot">.</span>
+        </a>
+        <button class="navbar-toggler d-lg-none" type="button" id="bx-menu-toggle" aria-label="Menu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse d-none d-lg-flex" id="bxNav">
+            <ul class="navbar-nav mx-auto">
+                <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Home</a></li>
+                {% if user.is_authenticated %}
+                <li class="nav-item"><a class="nav-link" href="{% url 'predictions:home' %}">Predictions</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'emergency:home' %}">Assistant</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'emergency:directory' %}">Doctors</a></li>
+                {% else %}
+                <li class="nav-item"><a class="nav-link" href="{% url 'home' %}#about">About</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'home' %}#features">Features</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'home' %}#how">How it works</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'home' %}#contact">Contact</a></li>
+                {% endif %}
+            </ul>
+            <ul class="navbar-nav align-items-lg-center gap-lg-2">
+                {% if user.is_authenticated %}
+                <li class="nav-item"><a class="nav-link" href="{% url 'dashboard:home' %}">Dashboard</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'users:profile' %}">Report</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'users:logout' %}">Logout</a></li>
+                {% else %}
+                <li class="nav-item"><a class="nav-link" href="{% url 'users:login' %}">Login</a></li>
+                <li class="nav-item"><a class="nav-link bx-btn-nav" href="{% url 'users:register' %}">Get Started</a></li>
+                {% endif %}
+            </ul>
         </div>
-    </footer>
+    </div>
+</nav>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    {% block scripts %}{% endblock %}
+<div id="bx-mobile-menu" class="bx-mobile-menu d-lg-none">
+    <a href="{% url 'home' %}">Home</a>
+    {% if user.is_authenticated %}
+    <a href="{% url 'dashboard:home' %}">Dashboard</a>
+    <a href="{% url 'predictions:home' %}">Predictions</a>
+    <a href="{% url 'emergency:home' %}">Assistant</a>
+    <a href="{% url 'users:logout' %}">Logout</a>
+    {% else %}
+    <a href="{% url 'home' %}#about">About</a>
+    <a href="{% url 'home' %}#contact">Contact</a>
+    <a href="{% url 'users:login' %}">Login</a>
+    <a href="{% url 'users:register' %}">Get Started</a>
+    {% endif %}
+</div>
+
+<main class="flex-grow-1">
+    {% if messages %}
+    <div class="container mt-3 position-relative" style="z-index:10">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% block content %}{% endblock %}
+</main>
+
+<footer class="bx-footer">
+    <div class="container text-center">
+        <p class="mb-2 small fw-semibold">Blobax v1.0 — AI Health for Bangladesh</p>
+        <p class="mb-2 bx-footer-links">
+            <a href="https://ragibh.github.io/" target="_blank" rel="noopener">Portfolio</a>
+            <span>·</span>
+            <a href="https://github.com/RagibH" target="_blank" rel="noopener">GitHub</a>
+            <span>·</span>
+            <a href="https://www.linkedin.com/in/ragib-hasan-828316317/" target="_blank" rel="noopener">LinkedIn</a>
+            <span>·</span>
+            <a href="mailto:ragibhasan53@gmail.com">Email</a>
+        </p>
+        <p class="mb-0 small text-muted">&copy; {% now "Y" %} Blobax · Built by <strong>Md. Ragib Hasan</strong> · Sylhet Engineering College</p>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/TextPlugin.min.js"></script>
+<script src="https://unpkg.com/splitting/dist/splitting.min.js"></script>
+<script src="{% static 'js/blobax.js' %}"></script>
+{% block scripts %}{% endblock %}
 </body>
 </html>

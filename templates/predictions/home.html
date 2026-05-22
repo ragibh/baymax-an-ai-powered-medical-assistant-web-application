@@ -1,82 +1,107 @@
 {% extends 'base.html' %}
-
+{% load static %}
+{% block title %}Predictions — Blobax{% endblock %}
 {% block content %}
-<div class="container mt-4">
-    <h2>Health Predictions</h2>
-    <p class="lead">Select a prediction type to get started:</p>
-    
-    <div class="row">
-        <!-- BMI Prediction -->
-        <div class="col-md-4 mb-4">
-            <div class="card h-100 text-center">
-                <div class="card-body">
-                    <i class="fas fa-weight fa-3x text-primary mb-3"></i>
-                    <h5 class="card-title">BMI Prediction</h5>
-                    <p class="card-text">Calculate your Body Mass Index and get health insights.</p>
-                    <a href="{% url 'predictions:bmi' %}" class="btn btn-primary">Calculate BMI</a>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Diabetes Prediction -->
-        <div class="col-md-4 mb-4">
-            <div class="card h-100 text-center">
-                <div class="card-body">
-                    <i class="fas fa-syringe fa-3x text-warning mb-3"></i>
-                    <h5 class="card-title">Diabetes Prediction</h5>
-                    <p class="card-text">Assess your risk of diabetes using AI analysis.</p>
-                    <a href="{% url 'predictions:diabetes' %}" class="btn btn-warning">Check Risk</a>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Heart Disease Prediction -->
-        <div class="col-md-4 mb-4">
-            <div class="card h-100 text-center">
-                <div class="card-body">
-                    <i class="fas fa-heart fa-3x text-danger mb-3"></i>
-                    <h5 class="card-title">Heart Disease</h5>
-                    <p class="card-text">Evaluate your heart health and potential risks.</p>
-                    <a href="{% url 'predictions:heart' %}" class="btn btn-danger">Assess Heart</a>
-                </div>
-            </div>
-        </div>
+
+<section class="bx-section bx-predictions-hub bx-page">
+  <div class="container">
+    <div class="text-center mb-4 bx-reveal">
+      <p class="bx-eyebrow">Health Intelligence</p>
+      <h1 class="bx-title">AI Predictions</h1>
+      <p class="bx-muted-text">Run any of the models below. Results are saved to your private health report.</p>
     </div>
-    
-    <div class="row mt-4">
-        <!-- Coming Soon Features -->
-        <div class="col-md-4 mb-4">
-            <div class="card h-100 text-center">
-                <div class="card-body">
-                    <i class="fas fa-liver fa-3x text-info mb-3"></i>
-                    <h5 class="card-title">Liver Disease</h5>
-                    <p class="card-text">Liver health assessment (Coming Soon)</p>
-                    <button class="btn btn-info" disabled>Coming Soon</button>
-                </div>
-            </div>
+
+    <div class="row g-4 justify-content-center">
+
+      <div class="col-md-6 col-lg-5 bx-reveal">
+        <div class="bx-pred-card bx-pred-card--diabetes">
+          <div class="bx-pred-card__icon"><i class="fas fa-syringe"></i></div>
+          <div class="bx-pred-card__badge bx-badge-live">LIVE</div>
+          <h3>Diabetes Prediction</h3>
+          <p>Predicts diabetes risk using 8 health indicators including HbA1c, glucose, BMI, and smoking history.</p>
+          <ul class="bx-pred-card__features">
+            <li><i class="fas fa-check"></i> 8 input features</li>
+            <li><i class="fas fa-check"></i> Random Forest model</li>
+            <li><i class="fas fa-check"></i> Probability score</li>
+          </ul>
+          <a href="{% url 'predictions:diabetes' %}" class="bx-btn bx-btn-primary w-100 mt-3">
+            <i class="fas fa-play me-2"></i>Run Diabetes Check
+          </a>
         </div>
-        
-        <div class="col-md-4 mb-4">
-            <div class="card h-100 text-center">
-                <div class="card-body">
-                    <i class="fas fa-kidneys fa-3x text-success mb-3"></i>
-                    <h5 class="card-title">Kidney Disease</h5>
-                    <p class="card-text">Kidney function analysis (Coming Soon)</p>
-                    <button class="btn btn-success" disabled>Coming Soon</button>
-                </div>
-            </div>
+      </div>
+
+      <div class="col-md-6 col-lg-5 bx-reveal">
+        <div class="bx-pred-card bx-pred-card--heart">
+          <div class="bx-pred-card__icon"><i class="fas fa-heart-pulse"></i></div>
+          <div class="bx-pred-card__badge bx-badge-live">LIVE</div>
+          <h3>Heart Disease Prediction</h3>
+          <p>Analyses 13 cardiology indicators — chest pain, ECG, cholesterol, exercise angina, and more.</p>
+          <ul class="bx-pred-card__features">
+            <li><i class="fas fa-check"></i> 13 clinical features</li>
+            <li><i class="fas fa-check"></i> Ensemble classifier</li>
+            <li><i class="fas fa-check"></i> Risk level rating</li>
+          </ul>
+          <a href="{% url 'predictions:heart' %}" class="bx-btn bx-btn-primary w-100 mt-3">
+            <i class="fas fa-play me-2"></i>Run Heart Check
+          </a>
         </div>
-        
-        <div class="col-md-4 mb-4">
-            <div class="card h-100 text-center">
-                <div class="card-body">
-                    <i class="fas fa-prescription fa-3x text-secondary mb-3"></i>
-                    <h5 class="card-title">Prescription Reader</h5>
-                    <p class="card-text">Read handwritten prescriptions (Coming Soon)</p>
-                    <button class="btn btn-secondary" disabled>Coming Soon</button>
-                </div>
-            </div>
+      </div>
+
+      <div class="col-md-6 col-lg-5 bx-reveal">
+        <div class="bx-pred-card bx-pred-card--liver">
+          <div class="bx-pred-card__icon"><i class="fas fa-flask"></i></div>
+          <div class="bx-pred-card__badge bx-badge-live">LIVE</div>
+          <h3>Liver Disease Prediction</h3>
+          <p>Uses liver function markers — ALT, AST, bilirubin, albumin, protein — from blood test results.</p>
+          <ul class="bx-pred-card__features">
+            <li><i class="fas fa-check"></i> 8 blood markers</li>
+            <li><i class="fas fa-check"></i> XGBoost model</li>
+            <li><i class="fas fa-check"></i> Lab value input</li>
+          </ul>
+          <a href="{% url 'predictions:liver' %}" class="bx-btn bx-btn-primary w-100 mt-3">
+            <i class="fas fa-play me-2"></i>Run Liver Check
+          </a>
         </div>
+      </div>
+
+      <div class="col-md-6 col-lg-5 bx-reveal">
+        <div class="bx-pred-card bx-pred-card--bmi">
+          <div class="bx-pred-card__icon"><i class="fas fa-weight-scale"></i></div>
+          <div class="bx-pred-card__badge bx-badge-ml">CALCULATOR</div>
+          <h3>BMI Calculator</h3>
+          <p>Body Mass Index from weight and height with WHO category classification.</p>
+          <ul class="bx-pred-card__features">
+            <li><i class="fas fa-check"></i> Instant result</li>
+            <li><i class="fas fa-check"></i> WHO categories</li>
+            <li><i class="fas fa-check"></i> Saved to report</li>
+          </ul>
+          <a href="{% url 'predictions:bmi' %}" class="bx-btn bx-btn-outline w-100 mt-3">
+            <i class="fas fa-calculator me-2"></i>Calculate BMI
+          </a>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-5 bx-reveal">
+        <div class="bx-pred-card bx-pred-card--bmi opacity-75">
+          <div class="bx-pred-card__icon"><i class="fas fa-kidneys"></i></div>
+          <div class="bx-pred-card__badge bx-badge-ml">SOON</div>
+          <h3>Kidney Disease</h3>
+          <p class="mb-3">Model integration coming soon.</p>
+          <a href="{% url 'predictions:kidney' %}" class="bx-btn bx-btn-outline w-100 mt-auto">Details</a>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-5 bx-reveal">
+        <div class="bx-pred-card bx-pred-card--bmi opacity-75">
+          <div class="bx-pred-card__icon"><i class="fas fa-file-prescription"></i></div>
+          <div class="bx-pred-card__badge bx-badge-ml">SOON</div>
+          <h3>Prescription OCR</h3>
+          <p class="mb-3">Handwritten prescription reading — coming soon.</p>
+          <a href="{% url 'predictions:prescription' %}" class="bx-btn bx-btn-outline w-100 mt-auto">Details</a>
+        </div>
+      </div>
+
     </div>
-</div>
+  </div>
+</section>
 {% endblock %}

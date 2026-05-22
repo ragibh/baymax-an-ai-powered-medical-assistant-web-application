@@ -1,0 +1,183 @@
+{% extends 'base.html' %}
+{% block title %}Heart Disease Prediction — Blobax{% endblock %}
+{% block content %}
+
+<section class="bx-section bx-pred-form-section bx-page">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+
+        <div class="text-center mb-4 bx-reveal">
+          <a href="{% url 'predictions:home' %}" class="bx-back-link"><i class="fas fa-arrow-left me-2"></i>Back to Predictions</a>
+          <div class="bx-pred-form-icon bx-pred-form-icon--heart mx-auto mt-3"><i class="fas fa-heart-pulse"></i></div>
+          <h1 class="bx-title mt-3">Heart Disease Prediction</h1>
+          <p class="bx-muted-text">13 clinical indicators from cardiology assessment.</p>
+        </div>
+
+        {% if result and not result.error %}
+        <div class="bx-result-card bx-result-card--{{ result.risk_level }} bx-reveal mb-4">
+          <div class="bx-result-card__top">
+            <div class="bx-result-card__icon">
+              {% if result.prediction == 1 %}<i class="fas fa-triangle-exclamation"></i>{% else %}<i class="fas fa-circle-check"></i>{% endif %}
+            </div>
+            <div>
+              <h3 class="bx-result-card__label">{{ result.label }}</h3>
+              <p class="bx-result-card__sub">Risk: <span class="bx-risk-{{ result.risk_level }}">{{ result.risk_level|title }}</span></p>
+            </div>
+          </div>
+          <div class="bx-result-probability">
+            <div class="bx-prob-label">Probability Score</div>
+            <div class="bx-prob-bar-wrap">
+              <div class="bx-prob-bar" style="--prob: {{ result.probability }}%"><div class="bx-prob-fill"></div></div>
+              <span class="bx-prob-pct">{{ result.probability }}%</span>
+            </div>
+          </div>
+          <p class="bx-result-disclaimer"><i class="fas fa-info-circle me-1"></i>AI prediction only — not a diagnosis. See a cardiologist.</p>
+        </div>
+        {% endif %}
+        {% if result.error %}<div class="alert alert-danger bx-reveal">{{ result.error }}</div>{% endif %}
+
+        <details class="bx-form-card bx-reveal mb-3" style="padding:1rem 1.25rem">
+          <summary class="bx-label mb-0" style="cursor:pointer">What do these values mean?</summary>
+          <ul class="small text-muted mt-3 mb-0 ps-3">
+            <li><strong>CP:</strong> Chest pain type during angina episodes.</li>
+            <li><strong>Trestbps:</strong> Resting blood pressure (mm Hg).</li>
+            <li><strong>Chol:</strong> Serum cholesterol (mg/dl).</li>
+            <li><strong>FBS:</strong> Fasting blood sugar &gt;120 mg/dl.</li>
+            <li><strong>Restecg:</strong> Resting ECG result.</li>
+            <li><strong>Thalach:</strong> Maximum heart rate during exercise test.</li>
+            <li><strong>Exang:</strong> Exercise-induced angina (chest pain during exertion).</li>
+            <li><strong>Oldpeak:</strong> ST depression induced by exercise vs rest.</li>
+            <li><strong>Slope:</strong> Slope of peak exercise ST segment.</li>
+            <li><strong>CA:</strong> Major vessels (0–4) seen on fluoroscopy.</li>
+            <li><strong>Thal:</strong> Thalassemia / perfusion defect type.</li>
+          </ul>
+        </details>
+
+        <div class="bx-form-card bx-reveal">
+          <form method="post" novalidate>
+            {% csrf_token %}
+            <div class="row g-3">
+
+              <div class="col-md-4">
+                <label class="bx-label" for="age">Age</label>
+                <input type="number" class="bx-input" id="age" name="age" min="1" max="120" required placeholder="e.g. 55">
+                <small class="bx-field-help">Patient age in years</small>
+              </div>
+
+              <div class="col-md-8">
+                <label class="bx-label">Sex</label>
+                <div class="bx-toggle-group">
+                  <input type="radio" name="sex" id="sex-m" value="1" class="bx-radio-hidden" checked>
+                  <label for="sex-m" class="bx-toggle-btn">Male (1)</label>
+                  <input type="radio" name="sex" id="sex-f" value="0" class="bx-radio-hidden">
+                  <label for="sex-f" class="bx-toggle-btn">Female (0)</label>
+                </div>
+              </div>
+
+              <div class="col-12">
+                <label class="bx-label">Chest Pain Type (cp)</label>
+                <div class="bx-toggle-group bx-toggle-group--wrap">
+                  <input type="radio" name="cp" id="cp0" value="0" class="bx-radio-hidden" checked>
+                  <label for="cp0" class="bx-toggle-btn">Typical Angina</label>
+                  <input type="radio" name="cp" id="cp1" value="1" class="bx-radio-hidden">
+                  <label for="cp1" class="bx-toggle-btn">Atypical Angina</label>
+                  <input type="radio" name="cp" id="cp2" value="2" class="bx-radio-hidden">
+                  <label for="cp2" class="bx-toggle-btn">Non-anginal</label>
+                  <input type="radio" name="cp" id="cp3" value="3" class="bx-radio-hidden">
+                  <label for="cp3" class="bx-toggle-btn">Asymptomatic</label>
+                </div>
+              </div>
+
+              <div class="col-md-4">
+                <label class="bx-label" for="trestbps">Resting BP</label>
+                <input type="number" class="bx-input" name="trestbps" id="trestbps" min="80" max="250" required placeholder="120">
+                <small class="bx-field-help">mm Hg — normal ~120/80</small>
+              </div>
+              <div class="col-md-4">
+                <label class="bx-label" for="chol">Cholesterol</label>
+                <input type="number" class="bx-input" name="chol" id="chol" min="100" max="600" required placeholder="200">
+                <small class="bx-field-help">mg/dl — desirable &lt;200</small>
+              </div>
+              <div class="col-md-4">
+                <label class="bx-label">Fasting BS &gt;120</label>
+                <div class="bx-toggle-group">
+                  <input type="radio" name="fbs" id="fbs0" value="0" class="bx-radio-hidden" checked>
+                  <label for="fbs0" class="bx-toggle-btn">No (≤120)</label>
+                  <input type="radio" name="fbs" id="fbs1" value="1" class="bx-radio-hidden">
+                  <label for="fbs1" class="bx-toggle-btn">Yes (&gt;120)</label>
+                </div>
+              </div>
+
+              <div class="col-12">
+                <label class="bx-label">Resting ECG (restecg)</label>
+                <div class="bx-toggle-group">
+                  <input type="radio" name="restecg" id="ecg0" value="0" class="bx-radio-hidden" checked>
+                  <label for="ecg0" class="bx-toggle-btn">Normal</label>
+                  <input type="radio" name="restecg" id="ecg1" value="1" class="bx-radio-hidden">
+                  <label for="ecg1" class="bx-toggle-btn">ST-T abnormality</label>
+                  <input type="radio" name="restecg" id="ecg2" value="2" class="bx-radio-hidden">
+                  <label for="ecg2" class="bx-toggle-btn">LV hypertrophy</label>
+                </div>
+              </div>
+
+              <div class="col-md-4">
+                <label class="bx-label" for="thalach">Max Heart Rate</label>
+                <input type="number" class="bx-input" name="thalach" id="thalach" min="60" max="250" required placeholder="150">
+                <small class="bx-field-help">bpm during stress test</small>
+              </div>
+              <div class="col-md-4">
+                <label class="bx-label">Exercise Angina</label>
+                <div class="bx-toggle-group">
+                  <input type="radio" name="exang" id="ex0" value="0" class="bx-radio-hidden" checked>
+                  <label for="ex0" class="bx-toggle-btn">No</label>
+                  <input type="radio" name="exang" id="ex1" value="1" class="bx-radio-hidden">
+                  <label for="ex1" class="bx-toggle-btn">Yes</label>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <label class="bx-label" for="oldpeak">ST Depression (oldpeak)</label>
+                <input type="number" step="0.1" class="bx-input" name="oldpeak" id="oldpeak" min="0" max="10" required placeholder="1.0">
+                <small class="bx-field-help">Relative to rest (0–10)</small>
+              </div>
+
+              <div class="col-md-6">
+                <label class="bx-label">ST Slope</label>
+                <div class="bx-toggle-group">
+                  <input type="radio" name="slope" id="sl0" value="0" class="bx-radio-hidden" checked>
+                  <label for="sl0" class="bx-toggle-btn">Upsloping</label>
+                  <input type="radio" name="slope" id="sl1" value="1" class="bx-radio-hidden">
+                  <label for="sl1" class="bx-toggle-btn">Flat</label>
+                  <input type="radio" name="slope" id="sl2" value="2" class="bx-radio-hidden">
+                  <label for="sl2" class="bx-toggle-btn">Downsloping</label>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <label class="bx-label" for="ca">Major Vessels (ca)</label>
+                <input type="number" class="bx-input" name="ca" id="ca" min="0" max="4" required value="0">
+                <small class="bx-field-help">0–4 vessels</small>
+              </div>
+              <div class="col-md-3">
+                <label class="bx-label">Thalassemia (thal)</label>
+                <div class="bx-toggle-group">
+                  <input type="radio" name="thal" id="th0" value="0" class="bx-radio-hidden" checked>
+                  <label for="th0" class="bx-toggle-btn">Normal</label>
+                  <input type="radio" name="thal" id="th1" value="1" class="bx-radio-hidden">
+                  <label for="th1" class="bx-toggle-btn">Fixed</label>
+                  <input type="radio" name="thal" id="th2" value="2" class="bx-radio-hidden">
+                  <label for="th2" class="bx-toggle-btn">Reversible</label>
+                </div>
+              </div>
+
+            </div>
+            <div class="bx-form-actions mt-4">
+              <button type="submit" class="bx-btn bx-btn-primary bx-btn-predict"><i class="fas fa-heart me-2"></i>Predict Heart Risk</button>
+              <button type="reset" class="bx-btn bx-btn-outline"><i class="fas fa-rotate-left me-2"></i>Reset</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,75 +1,49 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load socialaccount %}
+
+{% block title %}Sign in — Blobax{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-5">
-            <!-- Cute Header -->
-            <div class="text-center mb-4">
-                <img src="{% static 'images/baymax2.png' %}" alt="Baymax" style="height: 80px;" class="mb-3">
-                <h3 class="fw-bold" style="color: #FF6B6B;">Welcome Back! 👋</h3>
-                <p class="text-muted">Hello, I'm Baymax! Ready to continue your health journey?</p>
-            </div>
+<div class="bx-auth-wrap">
+    <div class="bx-auth-stars" aria-hidden="true"></div>
+    <div class="bx-auth-brand">
+        <img src="{% static 'images/blobax2.png' %}" alt="" width="72" class="mb-3 bx-float-slow" onerror="this.style.display='none'">
+        <h2>Welcome back</h2>
+        <p class="opacity-75 mb-0">Sign in with Google or your email to access predictions, assistant, and your health dashboard.</p>
+    </div>
+    <div class="bx-auth-form-panel">
+        <div class="bx-auth-card">
+            <h3 class="fw-bold mb-1">Sign in</h3>
 
-            <!-- Simple Login Card -->
-            <div class="card shadow-sm border-0" style="border-radius: 20px; background: #f8f9fa;">
-                <div class="card-body p-4">
-                    <form method="post">
-                        {% csrf_token %}
-                        
-                        <!-- Username -->
-                        <div class="mb-3">
-                            <label class="form-label small fw-bold">Username</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-white border-end-0">
-                                    <i class="fas fa-user text-primary"></i>
-                                </span>
-                                <input type="text" name="username" class="form-control border-start-0" 
-                                       placeholder="your_username" required>
-                            </div>
-                        </div>
+            <a href="{% provider_login_url 'google' %}" class="bx-btn bx-btn-google w-100 mb-3">
+                <svg width="18" height="18" viewBox="0 0 18 18" class="me-2" aria-hidden="true">
+                    <path fill="#4285F4" d="M16.51 8H8.98v3h4.3c-.18 1-.74 1.48-1.6 2.04v2.01h2.6a7.8 7.8 0 0 0 2.38-5.88c0-.57-.05-.66-.15-1.18z"/>
+                    <path fill="#34A853" d="M8.98 17c2.16 0 3.97-.72 5.3-1.94l-2.6-2a4.8 4.8 0 0 1-7.18-2.54H1.83v2.07A8 8 0 0 0 8.98 17z"/>
+                    <path fill="#FBBC05" d="M4.5 10.52a4.8 4.8 0 0 1 0-3.04V5.41H1.83a8 8 0 0 0 0 7.18l2.67-2.07z"/>
+                    <path fill="#EA4335" d="M8.98 4.18c1.17 0 2.23.4 3.06 1.2l2.3-2.3A8 8 0 0 0 1.83 5.4L4.5 7.49a4.77 4.77 0 0 1 4.48-3.3z"/>
+                </svg>
+                Continue with Google
+            </a>
 
-                        <!-- Password -->
-                        <div class="mb-4">
-                            <label class="form-label small fw-bold">Password</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-white border-end-0">
-                                    <i class="fas fa-lock text-primary"></i>
-                                </span>
-                                <input type="password" name="password" class="form-control border-start-0" 
-                                       placeholder="••••••••" required>
-                            </div>
-                        </div>
+            <div class="bx-divider"><span>or sign in with email</span></div>
 
-                        <!-- Login Button -->
-                        <button type="submit" class="btn btn-primary w-100 py-2 fw-bold" 
-                                style="border-radius: 15px; background: #FF6B6B; border: none;">
-                            <i class="fas fa-heart me-2"></i>Login
-                        </button>
-                    </form>
-
-                    <!-- Register Link -->
-                    <div class="text-center mt-3">
-                        <small class="text-muted">
-                            New here? 
-                            <a href="{% url 'users:register' %}" class="text-decoration-none" style="color: #FF6B6B;">
-                                Create account
-                            </a>
-                        </small>
-                    </div>
+            <form method="post" action="{% url 'users:login' %}">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label class="bx-label">Username</label>
+                    <input type="text" name="username" class="bx-input" placeholder="Enter username" required autofocus>
                 </div>
-            </div>
+                <div class="mb-4">
+                    <label class="bx-label">Password</label>
+                    <input type="password" name="password" class="bx-input" placeholder="Enter password" required>
+                </div>
+                <button type="submit" class="bx-btn bx-btn-primary w-100">Sign in</button>
+            </form>
+            <p class="text-center text-muted small mt-4 mb-0">
+                New here? <a href="{% url 'users:register' %}" class="fw-semibold" style="color:var(--bx-accent)">Create account</a>
+            </p>
         </div>
     </div>
 </div>
-
-<style>
-    .input-group-text, .form-control {
-        border-radius: 10px !important;
-    }
-    .card {
-        border: 2px solid rgba(255, 107, 107, 0.1);
-    }
-</style>
 {% endblock %}

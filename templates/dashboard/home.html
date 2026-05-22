@@ -1,66 +1,48 @@
 {% extends 'base.html' %}
-{% load static %}
+
+{% block title %}Dashboard — Blobax{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <h2>Health Dashboard</h2>
-    
-    <!-- Quick Action Cards -->
-    <div class="row mt-4">
-        <div class="col-md-4 mb-4">
-            <div class="card text-center h-100">
-                <div class="card-body">
-                    <i class="fas fa-heartbeat fa-3x text-primary mb-3"></i>
-                    <h5 class="card-title">Health Predictions</h5>
-                    <p class="card-text">Check your health status with AI predictions</p>
-                    <a href="{% url 'predictions:home' %}" class="btn btn-primary">Get Predictions</a>
+<div class="bx-page">
+    <div class="container">
+        <div class="bx-dash-header bx-reveal">
+            <p class="bx-eyebrow">Dashboard</p>
+            <h1 class="bx-title h2">Your health hub</h1>
+            <p class="text-muted">Quick access to tools and your latest stats.</p>
+        </div>
+
+        <div class="row g-4 mb-5 bx-reveal">
+            <div class="col-md-4">
+                <div class="bx-card bx-pred-card">
+                    <div class="bx-card-icon blue mx-auto"><i class="fas fa-calculator"></i></div>
+                    <h5 class="fw-bold">Predictions</h5>
+                    <p class="text-muted small">BMI live · ML models coming soon</p>
+                    <a href="{% url 'predictions:home' %}" class="bx-btn bx-btn-primary btn-sm mt-2">Open</a>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="bx-card bx-pred-card">
+                    <div class="bx-card-icon red mx-auto"><i class="fas fa-comment-medical"></i></div>
+                    <h5 class="fw-bold">Health assistant</h5>
+                    <p class="text-muted small">Simple AI chat for guidance</p>
+                    <a href="{% url 'emergency:home' %}" class="bx-btn bx-btn-accent btn-sm mt-2">Chat</a>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="bx-card bx-pred-card">
+                    <div class="bx-card-icon teal mx-auto"><i class="fas fa-user-doctor"></i></div>
+                    <h5 class="fw-bold">Doctor directory</h5>
+                    <p class="text-muted small">Find providers in Bangladesh</p>
+                    <a href="{% url 'emergency:directory' %}" class="bx-btn bx-btn-outline btn-sm mt-2">Browse</a>
                 </div>
             </div>
         </div>
-        
-        <div class="col-md-4 mb-4">
-            <div class="card text-center h-100">
-                <div class="card-body">
-                    <i class="fas fa-ambulance fa-3x text-danger mb-3"></i>
-                    <h5 class="card-title">Emergency Assistant</h5>
-                    <p class="card-text">24/7 health support and emergency guidance</p>
-                    <a href="{% url 'emergency:home' %}" class="btn btn-danger">Get Help</a>
-                </div>
-            </div>
+
+        <div class="mb-3 bx-reveal">
+            <h4 class="fw-bold">Your activity</h4>
+            <p class="text-muted small">Summary from your account only</p>
         </div>
-        
-        <div class="col-md-4 mb-4">
-            <div class="card text-center h-100">
-                <div class="card-body">
-                    <i class="fas fa-chart-line fa-3x text-success mb-3"></i>
-                    <h5 class="card-title">Health History</h5>
-                    <p class="card-text">View your prediction history and trends</p>
-                    <a href="{% url 'dashboard:profile' %}" class="btn btn-success">View Profile</a>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Recent Activity -->
-    <div class="row mt-4">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h5>Recent Activity</h5>
-                </div>
-                <div class="card-body">
-                    <p>Your recent health predictions and activities will appear here.</p>
-                    <div class="text-center">
-                        <a href="{% url 'predictions:home' %}" class="btn btn-outline-primary me-2">
-                            Make a Prediction
-                        </a>
-                        <a href="{% url 'emergency:home' %}" class="btn btn-outline-danger">
-                            Emergency Chat
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
+        {% include 'partials/health_report.html' %}
     </div>
 </div>
 {% endblock %}

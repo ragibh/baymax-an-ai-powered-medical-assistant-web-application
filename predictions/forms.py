@@ -1,10 +1,13 @@
 from django import forms
 
-class BMIPredictionForm(forms.Form):
+from .widgets import BlobaxFormMixin
+
+
+class BMIPredictionForm(BlobaxFormMixin, forms.Form):
     height = forms.FloatField(label='Height (cm)', min_value=0)
     weight = forms.FloatField(label='Weight (kg)', min_value=0)
 
-class DiabetesPredictionForm(forms.Form):
+class DiabetesPredictionForm(BlobaxFormMixin, forms.Form):
     pregnancies = forms.IntegerField(label='Pregnancies', min_value=0)
     glucose = forms.FloatField(label='Glucose Level', min_value=0)
     blood_pressure = forms.FloatField(label='Blood Pressure', min_value=0)
@@ -14,7 +17,7 @@ class DiabetesPredictionForm(forms.Form):
     diabetes_pedigree = forms.FloatField(label='Diabetes Pedigree Function', min_value=0)
     age = forms.IntegerField(label='Age', min_value=0)
 
-class HeartDiseaseForm(forms.Form):
+class HeartDiseaseForm(BlobaxFormMixin, forms.Form):
     age = forms.IntegerField(label='Age', min_value=0)
     sex = forms.ChoiceField(label='Sex', choices=[(0, 'Female'), (1, 'Male')])
     cp = forms.ChoiceField(label='Chest Pain Type', choices=[

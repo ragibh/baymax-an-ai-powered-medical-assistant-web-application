@@ -1,715 +1,177 @@
 {% extends 'base.html' %}
 {% load static %}
 
+{% block title %}Health Assistant — Blobax{% endblock %}
+{% block body_class %}bx-page-chat{% endblock %}
+{% block extra_css %}
+<link href="{% static 'css/pages-chat.css' %}" rel="stylesheet">
+{% endblock %}
+
 {% block content %}
+<div class="bx-chat-app">
+    <header class="bx-chat-topbar bx-reveal">
+        <img src="{% static 'images/blobax1.png' %}" alt="Blobax" onerror="this.style.display='none'">
+        <div>
+            <h1>Blobax Assistant</h1>
+            <p class="bx-status mb-0">
+                <span class="bx-status-dot {% if 'Online' not in gemini_status %}offline{% endif %}"></span>
+                {{ gemini_status }} · {{ response_time }}
+            </p>
+        </div>
+        <div class="bx-chat-topbar-actions">
+            <a href="{% url 'emergency:directory' %}" class="bx-btn bx-btn-outline btn-sm">Doctors</a>
+            <a href="{% url 'dashboard:home' %}" class="bx-btn bx-btn-outline btn-sm">Dashboard</a>
+            <button type="button" id="clear-chat-btn" class="bx-btn bx-btn-outline btn-sm">Clear chat</button>
+        </div>
+    </header>
 
-<!-- ── AMBIENT GLOW ORBS ── -->
-<div style="position:fixed;width:400px;height:400px;border-radius:50%;background:rgba(0,212,255,0.05);filter:blur(80px);top:10%;left:5%;pointer-events:none;z-index:0;animation:orbDrift 12s ease-in-out infinite;"></div>
-<div style="position:fixed;width:300px;height:300px;border-radius:50%;background:rgba(255,75,106,0.04);filter:blur(80px);bottom:15%;right:5%;pointer-events:none;z-index:0;animation:orbDrift 10s ease-in-out infinite 4s;"></div>
-
-<div class="bx-chat-page">
-    <div class="bx-layout">
-
-        <!-- ══ LEFT PANEL — BAYMAX FIGURE ══ -->
-        <aside class="bx-left-panel">
-
-            <!-- Baymax figure card -->
-            <div class="bx-panel-card bx-baymax-card">
-                <div class="bx-aura-wrap">
-                    <div class="bx-aura r1"></div>
-                    <div class="bx-aura r2"></div>
-                    <div class="bx-aura r3"></div>
-                    <img src="{% static 'images/baymax2.png' %}" class="bx-figure-img" alt="Baymax">
-                </div>
-                <div class="bx-bot-name">BAYMAX</div>
-                <div class="bx-bot-sub">Personal Healthcare Companion</div>
-                <div class="bx-status-pill {% if gemini_status == '✅ Online' %}bx-online{% else %}bx-offline{% endif %}">
-                    <span class="bx-status-dot"></span>
-                    {% if gemini_status == '✅ Online' %}AI Online{% else %}Fallback Mode{% endif %}
-                    {% if model_info %}&nbsp;·&nbsp;{{ model_info|cut:"models/" }}{% endif %}
-                </div>
-                <!-- Health scan bars -->
-                <div class="bx-scan-bars">
-                    <div class="bx-scan-row">
-                        <span class="bx-scan-lbl">AI Core</span>
-                        <div class="bx-scan-track"><div class="bx-scan-fill" style="width:98%;background:linear-gradient(90deg,#00D4FF,#00FF88);"></div></div>
-                        <span class="bx-scan-val">98%</span>
-                    </div>
-                    <div class="bx-scan-row">
-                        <span class="bx-scan-lbl">Response</span>
-                        <div class="bx-scan-track"><div class="bx-scan-fill" style="width:91%;background:linear-gradient(90deg,#00FF88,#00D4FF);"></div></div>
-                        <span class="bx-scan-val">91%</span>
-                    </div>
-                    <div class="bx-scan-row">
-                        <span class="bx-scan-lbl">Accuracy</span>
-                        <div class="bx-scan-track"><div class="bx-scan-fill" style="width:95%;background:linear-gradient(90deg,#00D4FF,#A060FF);"></div></div>
-                        <span class="bx-scan-val">95%</span>
-                    </div>
-                </div>
+    <div class="bx-chat-shell bx-reveal">
+        <aside class="bx-chat-toolbar">
+            <div class="bx-chat-chip-wrap">
+                <h6>Quick topics</h6>
+                <button type="button" class="bx-chat-chip emergency-topic" data-topic="heart pain emergency">Heart / chest pain</button>
+                <button type="button" class="bx-chat-chip emergency-topic" data-topic="choking help">Choking</button>
+                <button type="button" class="bx-chat-chip emergency-topic" data-topic="severe bleeding">Bleeding</button>
+                <button type="button" class="bx-chat-chip emergency-topic" data-topic="high fever">High fever</button>
+                <button type="button" class="bx-chat-chip emergency-topic" data-topic="I feel anxious">Anxiety</button>
             </div>
-
-            <!-- Quick topic buttons -->
-            <div class="bx-panel-card">
-                <div class="bx-panel-title">Quick Topics</div>
-                <button class="bx-topic-btn emergency-topic" data-topic="heart pain emergency">❤️ &nbsp;Heart / Chest Pain</button>
-                <button class="bx-topic-btn emergency-topic" data-topic="choking help">🆘 &nbsp;Choking</button>
-                <button class="bx-topic-btn emergency-topic" data-topic="severe bleeding">🩸 &nbsp;Bleeding</button>
-                <button class="bx-topic-btn emergency-topic" data-topic="burn treatment">🔥 &nbsp;Burns</button>
-                <button class="bx-topic-btn emergency-topic" data-topic="high fever">🤒 &nbsp;Fever</button>
-                <button class="bx-topic-btn emergency-topic" data-topic="severe headache">🧠 &nbsp;Headache</button>
-                <button class="bx-topic-btn emergency-topic" data-topic="allergic reaction">🌸 &nbsp;Allergy</button>
-                <button class="bx-topic-btn emergency-topic" data-topic="anxiety panic attack">😰 &nbsp;Anxiety</button>
-            </div>
-
         </aside>
 
-        <!-- ══ CENTER — CHAT WINDOW ══ -->
-        <div class="bx-chat-window">
-
-            <!-- Chat header -->
-            <div class="bx-chat-header">
-                <div class="bx-chat-avatar">
-                    <img src="{% static 'images/baymax1.png' %}" alt="Baymax">
-                </div>
-                <div class="bx-chat-header-info">
-                    <div class="bx-chat-name">Baymax Health Assistant</div>
-                    <div class="bx-chat-active">
-                        <span class="bx-active-dot"></span>
-                        Active &nbsp;·&nbsp; {{ gemini_status }}
+        <main class="bx-chat-panel">
+            <div id="chat-messages" class="bx-chat-thread">
+                <div class="bx-chat-msg bot">
+                    <img src="{% static 'images/blobax1.png' %}" class="bx-chat-av" alt="" onerror="this.style.visibility='hidden'">
+                    <div>
+                        <div class="bx-chat-bubble">
+                            Hello! I'm Blobax. Ask a health question or pick a quick topic. For emergencies, call <strong>999</strong> or <strong>199</strong>.
+                        </div>
                     </div>
                 </div>
-                <div class="bx-header-right">
-                    <span class="badge {% if gemini_status == '✅ Online' %}bx-badge-green{% else %}bx-badge-yellow{% endif %}">
-                        {{ gemini_status }}
-                    </span>
-                    <small style="color:rgba(180,210,255,0.4);display:block;font-size:0.7rem;margin-top:2px;">{{ response_time }}</small>
+                {% for message in recent_messages %}
+                {% if message.message %}
+                <div class="bx-chat-msg user">
+                    <div class="bx-chat-av">{{ request.user.username|first|upper }}</div>
+                    <div><div class="bx-chat-bubble">{{ message.message|linebreaksbr }}</div></div>
                 </div>
-                <button id="clear-chat-btn" class="bx-clear-btn" title="Clear Chat">
-                    🗑️
+                {% endif %}
+                {% if message.response %}
+                <div class="bx-chat-msg bot">
+                    <img src="{% static 'images/blobax1.png' %}" class="bx-chat-av" alt="" onerror="this.style.visibility='hidden'">
+                    <div><div class="bx-chat-bubble">{{ message.response|linebreaksbr }}</div></div>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+
+            <div class="bx-chat-composer">
+                <input type="text" id="chat-input" placeholder="Ask Blobax about symptoms, first aid, or wellness…" maxlength="500" autocomplete="off">
+                <button type="button" id="send-btn" class="bx-btn bx-btn-primary bx-chat-send">
+                    <i class="fas fa-paper-plane me-1"></i> Send
                 </button>
             </div>
+        </main>
 
-            <!-- Messages area -->
-            <div id="chat-messages" class="bx-messages">
-
-                <div class="bx-date-sep"><span>Today</span></div>
-
-                <!-- Welcome message -->
-                <div class="bx-msg-row">
-                    <div class="bx-msg-avatar bx-bot-av">
-                        <img src="{% static 'images/baymax1.png' %}" alt="Baymax">
-                    </div>
-                    <div class="bx-msg-wrap">
-                        <div class="bx-msg-sender">Baymax</div>
-                        <div class="bx-bubble bx-bot-bubble bx-welcome-bubble">
-                            Hello! I'm Baymax, your personal healthcare companion. 🩺<br><br>
-                            I'm here to help with health questions, first aid, and general wellness. How are you feeling today?
-                            <div class="bx-welcome-tip">
-                                💡 <strong>Tip:</strong> Use the quick topics on the left, or type your question below.
-                            </div>
-                        </div>
-                        <div class="bx-msg-time">just now</div>
-                    </div>
-                </div>
-
-                <!-- Previous messages from DB -->
-                {% for message in recent_messages %}
-                <div class="bx-msg-row {% if message.is_user %}bx-user-row{% endif %}">
-                    {% if not message.is_user %}
-                    <div class="bx-msg-avatar bx-bot-av">
-                        <img src="{% static 'images/baymax1.png' %}" alt="Baymax">
-                    </div>
-                    {% endif %}
-                    <div class="bx-msg-wrap {% if message.is_user %}bx-user-wrap{% endif %}">
-                        <div class="bx-msg-sender">{% if message.is_user %}You{% else %}Baymax{% endif %}</div>
-                        <div class="bx-bubble {% if message.is_user %}bx-user-bubble{% else %}bx-bot-bubble{% endif %}">
-                            {% if message.is_user %}
-                                {{ message.message|linebreaks }}
-                            {% else %}
-                                {{ message.response|linebreaks }}
-                            {% endif %}
-                        </div>
-                        <div class="bx-msg-time">{{ message.timestamp|timesince }} ago</div>
-                    </div>
-                    {% if message.is_user %}
-                    <div class="bx-msg-avatar bx-user-av">
-                        {{ request.user.username|first|upper }}
-                    </div>
-                    {% endif %}
-                </div>
+        <aside class="bx-chat-aside">
+            <div class="bx-chat-hotline">
+                <h6 class="small text-uppercase mb-2" style="letter-spacing:0.1em;color:var(--bx-accent-3)">Emergency</h6>
+                <p class="small text-muted mb-1">Bangladesh</p>
+                <p class="mb-1"><strong>999</strong> National</p>
+                <p class="mb-0"><strong>199</strong> Health</p>
+            </div>
+            {% if contacts %}
+            <div class="bx-chat-chip-wrap">
+                <h6>Contacts</h6>
+                {% for c in contacts %}
+                <p class="small mb-2"><strong>{{ c.name }}</strong><br><a href="tel:{{ c.phone }}" class="text-decoration-none" style="color:var(--bx-accent)">{{ c.phone }}</a></p>
                 {% endfor %}
-
             </div>
-
-            <!-- Quick chips -->
-            <div class="bx-chips">
-                <span class="bx-chip emergency-topic" data-topic="What should I do for a headache?">💊 Headache</span>
-                <span class="bx-chip emergency-topic" data-topic="I have a fever, what should I do?">🌡️ Fever</span>
-                <span class="bx-chip emergency-topic" data-topic="How to treat a minor burn at home?">🔥 Burn</span>
-                <span class="bx-chip emergency-topic" data-topic="I feel anxious and stressed">😰 Anxiety</span>
-                <span class="bx-chip emergency-topic" data-topic="signs of dehydration">💧 Dehydration</span>
-            </div>
-
-            <!-- Input row -->
-            <div class="bx-input-area">
-                <div class="bx-input-row">
-                    <input type="text" id="chat-input" class="bx-input-field"
-                           placeholder="Describe your symptoms or ask a health question...">
-                    <button id="send-btn" class="bx-send-btn">
-                        <i class="fa fa-paper-plane"></i>
-                    </button>
-                </div>
-                <div class="bx-input-hint">
-                    🛡️ Private &nbsp;·&nbsp; ⚡ Gemini AI &nbsp;·&nbsp; 💖 Not a substitute for professional medical advice
-                </div>
-            </div>
-
-        </div>
-
-        <!-- ══ RIGHT PANEL — INFO SIDEBAR ══ -->
-        <aside class="bx-right-panel">
-
-            <!-- Emergency Quick Guide -->
-            <div class="bx-panel-card">
-                <div class="bx-panel-title" style="color:#FF4B6A;">🚑 Emergency Guide</div>
-                <div class="bx-emergency-item">
-                    <div class="bx-e-icon" style="background:rgba(255,75,106,0.15);color:#FF4B6A;">❤️</div>
-                    <div>
-                        <div class="bx-e-title">Heart Attack</div>
-                        <div class="bx-e-desc">Call 999. Chew aspirin. Sit down. Stay calm.</div>
-                    </div>
-                </div>
-                <div class="bx-emergency-item">
-                    <div class="bx-e-icon" style="background:rgba(255,140,0,0.15);color:#FF8C00;">🆘</div>
-                    <div>
-                        <div class="bx-e-title">Choking</div>
-                        <div class="bx-e-desc">5 back blows + 5 abdominal thrusts. Repeat.</div>
-                    </div>
-                </div>
-                <div class="bx-emergency-item">
-                    <div class="bx-e-icon" style="background:rgba(255,75,106,0.12);color:#FF4B6A;">🩸</div>
-                    <div>
-                        <div class="bx-e-title">Bleeding</div>
-                        <div class="bx-e-desc">Firm pressure. Elevate above heart. Don't remove cloth.</div>
-                    </div>
-                </div>
-                <div class="bx-emergency-item">
-                    <div class="bx-e-icon" style="background:rgba(255,180,0,0.12);color:#FFB400;">🔥</div>
-                    <div>
-                        <div class="bx-e-title">Burns</div>
-                        <div class="bx-e-desc">Cool water 20 mins. Cover loosely. No ice or butter.</div>
-                    </div>
-                </div>
-                <div class="bx-emergency-item">
-                    <div class="bx-e-icon" style="background:rgba(68,153,255,0.12);color:#4499FF;">🫁</div>
-                    <div>
-                        <div class="bx-e-title">CPR</div>
-                        <div class="bx-e-desc">30 compressions + 2 breaths. Call 999 first.</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Quick Contacts -->
-            <div class="bx-panel-card">
-                <div class="bx-panel-title">📞 Quick Contacts</div>
-                {% for contact in contacts|slice:":3" %}
-                <div class="bx-contact-item">
-                    <div class="bx-contact-icon"><i class="fa fa-hospital"></i></div>
-                    <div style="flex:1;min-width:0;">
-                        <div class="bx-contact-name">{{ contact.name }}</div>
-                        <div class="bx-contact-phone">{{ contact.phone }}</div>
-                    </div>
-                    <a href="tel:{{ contact.phone }}" class="bx-call-btn"><i class="fa fa-phone"></i></a>
-                </div>
-                {% empty %}
-                <div class="bx-contact-item">
-                    <div class="bx-contact-icon"><i class="fa fa-phone"></i></div>
-                    <div style="flex:1;">
-                        <div class="bx-contact-name">Emergency BD</div>
-                        <div class="bx-contact-phone">999</div>
-                    </div>
-                    <a href="tel:999" class="bx-call-btn"><i class="fa fa-phone"></i></a>
-                </div>
-                <div class="bx-contact-item">
-                    <div class="bx-contact-icon"><i class="fa fa-truck-medical"></i></div>
-                    <div style="flex:1;">
-                        <div class="bx-contact-name">Ambulance</div>
-                        <div class="bx-contact-phone">199</div>
-                    </div>
-                    <a href="tel:199" class="bx-call-btn"><i class="fa fa-phone"></i></a>
-                </div>
-                {% endfor %}
-                <a href="{% url 'emergency:directory' %}" class="bx-dir-link">
-                    <i class="fa fa-list"></i> View All Doctors
-                </a>
-            </div>
-
-            <!-- Baymax Facts -->
-            <div class="bx-panel-card">
-                <div class="bx-panel-title" style="color:#00FF88;">💫 Baymax Facts</div>
-                <div class="bx-fact-item"><span>🤖</span> Inspired by Disney's Big Hero 6</div>
-                <div class="bx-fact-item"><span>💖</span> Programmed for your wellbeing</div>
-                <div class="bx-fact-item"><span>🧠</span> Powered by Gemini AI</div>
-                <div class="bx-fact-item"><span>🌏</span> Built for Bangladesh healthcare</div>
-                <div class="bx-fact-item"><span>⚡</span> Fast, caring, always available</div>
-            </div>
-
+            {% endif %}
         </aside>
-
     </div>
 </div>
-
 {% endblock %}
 
 {% block scripts %}
 <script>
-const currentSessionId = 'user_{{ request.user.id }}_' + Date.now();
-const USER_INITIAL = "{{ request.user.username|first|upper }}";
+(function() {
+    const chatUrl = "{% url 'emergency:chatbot_api' %}";
+    const clearUrl = "{% url 'emergency:clear_chat' %}";
+    let sessionId = 'user_{{ request.user.id }}_' + Date.now();
+    const messagesEl = document.getElementById('chat-messages');
+    const inputEl = document.getElementById('chat-input');
+    const botImg = "{% static 'images/blobax1.png' %}";
+    const userInitial = "{{ request.user.username|first|upper }}";
 
-/* ── CLEAR CHAT ── */
-async function clearChat() {
-    if (!confirm('Are you sure you want to clear all chat messages?')) return;
-    try {
-        const response = await fetch("{% url 'emergency:clear_chat' %}", {
-            method: "POST",
-            headers: { "Content-Type": "application/json", "X-CSRFToken": "{{ csrf_token }}" }
-        });
-        const data = await response.json();
-        if (data.success) {
-            const chatMessages = document.getElementById('chat-messages');
-            const welcomeMsg = chatMessages.querySelector('.bx-msg-row');
-            chatMessages.innerHTML = '';
-            const sep = document.createElement('div');
-            sep.className = 'bx-date-sep'; sep.innerHTML = '<span>Today</span>';
-            chatMessages.appendChild(sep);
-            chatMessages.appendChild(welcomeMsg);
-            addMessageToChat('Chat cleared! How can I help you today? 🩺', false);
-        }
-    } catch (error) { console.error('Clear error:', error); }
-}
-
-/* ── SEND MESSAGE ── */
-async function sendMessage() {
-    const input = document.getElementById('chat-input');
-    const message = input.value.trim();
-    if (!message) return;
-
-    input.value = '';
-    input.disabled = true;
-    document.getElementById('send-btn').disabled = true;
-
-    addMessageToChat(message, true);
-    showTypingIndicator();
-
-    try {
-        const response = await fetch("{% url 'emergency:chatbot_api' %}", {
-            method: "POST",
-            headers: { "Content-Type": "application/json", "X-CSRFToken": "{{ csrf_token }}" },
-            body: JSON.stringify({ message: message, session_id: currentSessionId })
-        });
-        const data = await response.json();
-        hideTypingIndicator();
-        addMessageToChat(data.response || "I'm here! Let me think about that... 🩺", false);
-    } catch (error) {
-        hideTypingIndicator();
-        addMessageToChat("I'm still here! Let's try that again? 💖", false);
-    } finally {
-        input.disabled = false;
-        document.getElementById('send-btn').disabled = false;
-        input.focus();
+    function scrollBottom() {
+        messagesEl.scrollTop = messagesEl.scrollHeight;
     }
-}
 
-/* ── APPEND MESSAGE ── */
-function addMessageToChat(content, isUser) {
-    const chatMessages = document.getElementById('chat-messages');
-    const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    const formatted = content.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    function addMsg(text, isUser) {
+        const row = document.createElement('div');
+        row.className = 'bx-chat-msg ' + (isUser ? 'user' : 'bot');
+        const safe = BlobaxChat.formatMessage(text);
+        if (isUser) {
+            row.innerHTML = '<div class="bx-chat-av">' + userInitial + '</div><div><div class="bx-chat-bubble">' + safe + '</div></div>';
+        } else {
+            row.innerHTML = '<img src="' + botImg + '" class="bx-chat-av" alt=""><div><div class="bx-chat-bubble">' + safe + '</div></div>';
+        }
+        messagesEl.appendChild(row);
+        scrollBottom();
+    }
 
-    const row = document.createElement('div');
-    row.className = `bx-msg-row${isUser ? ' bx-user-row' : ''} bx-msg-animate`;
+    function showTyping() {
+        const el = document.createElement('div');
+        el.className = 'bx-chat-msg bot bx-chat-typing';
+        el.id = 'bx-typing';
+        el.innerHTML = '<div class="bx-chat-av"></div><div class="bx-chat-bubble"><span></span><span></span><span></span></div>';
+        messagesEl.appendChild(el);
+        scrollBottom();
+    }
 
-    const botAvatar = `<div class="bx-msg-avatar bx-bot-av"><img src="{% static 'images/baymax1.png' %}" alt="Baymax"></div>`;
-    const userAvatar = `<div class="bx-msg-avatar bx-user-av">${USER_INITIAL}</div>`;
+    function hideTyping() {
+        document.getElementById('bx-typing')?.remove();
+    }
 
-    row.innerHTML = `
-        ${!isUser ? botAvatar : ''}
-        <div class="bx-msg-wrap ${isUser ? 'bx-user-wrap' : ''}">
-            <div class="bx-msg-sender">${isUser ? 'You' : 'Baymax'}</div>
-            <div class="bx-bubble ${isUser ? 'bx-user-bubble' : 'bx-bot-bubble'}">${formatted}</div>
-            <div class="bx-msg-time">${now}</div>
-        </div>
-        ${isUser ? userAvatar : ''}
-    `;
+    async function sendMessage() {
+        const text = inputEl.value.trim();
+        if (!text) return;
+        inputEl.value = '';
+        addMsg(text, true);
+        showTyping();
+        try {
+            const res = await fetch(chatUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': BlobaxChat.getCsrf() },
+                body: JSON.stringify({ message: text, session_id: sessionId }),
+            });
+            const data = await res.json();
+            hideTyping();
+            if (data.response) addMsg(data.response, false);
+            else if (data.error) addMsg(data.error, false);
+        } catch (e) {
+            hideTyping();
+            addMsg("Connection issue — please try again.", false);
+        }
+    }
 
-    chatMessages.appendChild(row);
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-}
+    document.getElementById('send-btn').addEventListener('click', sendMessage);
+    inputEl.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } });
 
-/* ── TYPING INDICATOR ── */
-function showTypingIndicator() {
-    const chatMessages = document.getElementById('chat-messages');
-    const div = document.createElement('div');
-    div.id = 'typing-indicator';
-    div.className = 'bx-msg-row bx-msg-animate';
-    div.innerHTML = `
-        <div class="bx-msg-avatar bx-bot-av">
-            <img src="{% static 'images/baymax1.png' %}" alt="Baymax">
-        </div>
-        <div class="bx-typing-bubble">
-            <div class="bx-typing-dot"></div>
-            <div class="bx-typing-dot"></div>
-            <div class="bx-typing-dot"></div>
-        </div>
-    `;
-    chatMessages.appendChild(div);
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-}
-
-function hideTypingIndicator() {
-    const t = document.getElementById('typing-indicator');
-    if (t) t.remove();
-}
-
-/* ── EVENT LISTENERS ── */
-document.getElementById('send-btn').addEventListener('click', sendMessage);
-document.getElementById('chat-input').addEventListener('keypress', e => {
-    if (e.key === 'Enter') sendMessage();
-});
-document.getElementById('clear-chat-btn').addEventListener('click', clearChat);
-
-// All emergency topic buttons + chips
-document.querySelectorAll('.emergency-topic').forEach(btn => {
-    btn.addEventListener('click', function () {
-        document.getElementById('chat-input').value = this.getAttribute('data-topic');
-        sendMessage();
+    document.querySelectorAll('.emergency-topic').forEach((btn) => {
+        btn.addEventListener('click', () => {
+            inputEl.value = btn.dataset.topic || btn.textContent.trim();
+            sendMessage();
+        });
     });
-});
 
-window.addEventListener('load', () => {
-    document.getElementById('chat-input').focus();
-    document.getElementById('chat-messages').scrollTop = 99999;
-});
+    document.getElementById('clear-chat-btn').addEventListener('click', async () => {
+        if (!confirm('Clear all chat messages?')) return;
+        await fetch(clearUrl, { method: 'POST', headers: { 'X-CSRFToken': BlobaxChat.getCsrf() } });
+        messagesEl.innerHTML = '';
+        addMsg("Chat cleared. How can I help you today?", false);
+    });
+
+    scrollBottom();
+})();
 </script>
-
-<style>
-/* ── KEYFRAMES ── */
-@keyframes orbDrift { 0%,100%{transform:translate(0,0);}50%{transform:translate(15px,-15px);} }
-@keyframes baymaxFloat { 0%,100%{transform:translateY(0) rotate(-1deg);}50%{transform:translateY(-12px) rotate(1deg);} }
-@keyframes auraBreath { 0%,100%{transform:scale(1);opacity:.6;}50%{transform:scale(1.06);opacity:1;} }
-@keyframes scanFill { 0%{width:0%;} }
-@keyframes bxMsgIn { 0%{opacity:0;transform:translateY(14px);}100%{opacity:1;transform:translateY(0);} }
-@keyframes typingBounce { 0%,60%,100%{transform:translateY(0);opacity:.5;}30%{transform:translateY(-6px);opacity:1;} }
-@keyframes statusPulse { 0%,100%{transform:scale(1);}50%{transform:scale(1.5);} }
-
-/* ── PAGE ── */
-.bx-chat-page {
-    position: relative;
-    z-index: 1;
-    padding: 1.5rem 1.5rem 3rem;
-    min-height: calc(100vh - 72px);
-}
-
-.bx-layout {
-    display: grid;
-    grid-template-columns: 280px 1fr 260px;
-    gap: 1.2rem;
-    max-width: 1380px;
-    margin: 0 auto;
-    align-items: start;
-}
-
-/* ── SHARED CARD ── */
-.bx-panel-card {
-    background: rgba(10,22,44,0.75);
-    border: 1px solid rgba(0,212,255,0.18);
-    border-radius: 20px;
-    padding: 1.4rem;
-    backdrop-filter: blur(20px);
-    margin-bottom: 1rem;
-    position: relative;
-    overflow: hidden;
-}
-
-.bx-panel-title {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 0.68rem;
-    letter-spacing: 2px;
-    color: #00D4FF;
-    text-transform: uppercase;
-    margin-bottom: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-.bx-panel-title::after { content:''; flex:1; height:1px; background:rgba(0,212,255,0.15); }
-
-/* ── BAYMAX FIGURE CARD ── */
-.bx-baymax-card { text-align: center; }
-.bx-baymax-card::before {
-    content:''; position:absolute; top:0;left:0;right:0; height:3px;
-    background:linear-gradient(90deg,#00D4FF,#00FF88);
-}
-
-.bx-aura-wrap {
-    position: relative;
-    width: 175px; height: 175px;
-    margin: 0 auto 1.2rem;
-    display: flex; align-items: center; justify-content: center;
-}
-
-.bx-aura {
-    position: absolute;
-    border-radius: 50%;
-    border: 1px solid rgba(0,212,255,0.18);
-    animation: auraBreath 3.5s ease-in-out infinite;
-}
-.bx-aura.r1 { width:100px;height:100px;background:radial-gradient(circle,rgba(0,212,255,0.1),transparent);animation-delay:0s; }
-.bx-aura.r2 { width:140px;height:140px;animation-delay:.6s; }
-.bx-aura.r3 { width:175px;height:175px;border-color:rgba(0,212,255,0.08);animation-delay:1.2s; }
-
-.bx-figure-img {
-    width: 100px;
-    position: relative; z-index: 2;
-    filter: drop-shadow(0 0 18px rgba(0,212,255,0.55));
-    animation: baymaxFloat 5s ease-in-out infinite;
-    cursor: pointer;
-    transition: filter .3s;
-}
-.bx-figure-img:hover { filter: drop-shadow(0 0 35px rgba(0,212,255,0.9)); }
-
-.bx-bot-name { font-family:'Orbitron',sans-serif; font-size:1.2rem; font-weight:700; color:#E8F4FF; margin-bottom:3px; }
-.bx-bot-sub { font-size:.78rem; color:rgba(180,210,255,.5); margin-bottom:1rem; }
-
-.bx-status-pill {
-    display:inline-flex; align-items:center; gap:6px;
-    padding:5px 14px; border-radius:30px; font-size:.75rem; font-weight:700;
-    margin-bottom:1.2rem;
-}
-.bx-online { background:rgba(0,255,136,.1); border:1px solid rgba(0,255,136,.3); color:#00FF88; }
-.bx-offline { background:rgba(255,180,0,.1); border:1px solid rgba(255,180,0,.3); color:#FFB400; }
-.bx-status-dot { width:7px;height:7px;border-radius:50%;background:currentColor;animation:statusPulse 1.5s ease infinite; }
-
-.bx-scan-bars { text-align:left; }
-.bx-scan-row { display:flex; align-items:center; gap:8px; margin-bottom:7px; }
-.bx-scan-lbl { font-size:.68rem; color:rgba(180,210,255,.4); width:55px; flex-shrink:0; }
-.bx-scan-track { flex:1; height:4px; background:rgba(255,255,255,.06); border-radius:2px; overflow:hidden; }
-.bx-scan-fill { height:100%; border-radius:2px; animation:scanFill 1.8s ease-out both; }
-.bx-scan-val { font-size:.68rem; font-family:'Orbitron',sans-serif; color:#00D4FF; width:28px; text-align:right; }
-
-/* ── TOPIC BUTTONS ── */
-.bx-topic-btn {
-    display:block; width:100%;
-    padding:9px 13px; margin-bottom:5px;
-    background:rgba(0,212,255,.04);
-    border:1px solid rgba(0,212,255,.1);
-    border-radius:12px;
-    color:rgba(180,210,255,.6);
-    font-family:'Nunito',sans-serif; font-size:.84rem; font-weight:600;
-    cursor:pointer; text-align:left;
-    transition:all .22s;
-}
-.bx-topic-btn:last-child { margin-bottom:0; }
-.bx-topic-btn:hover {
-    background:rgba(0,212,255,.12);
-    border-color:rgba(0,212,255,.35);
-    color:#E8F4FF;
-    transform:translateX(4px);
-}
-
-/* ── CHAT WINDOW ── */
-.bx-chat-window {
-    display:flex; flex-direction:column;
-    height:calc(100vh - 120px); min-height:580px;
-    background:rgba(10,22,44,.75);
-    border:1px solid rgba(0,212,255,.18);
-    border-radius:22px;
-    backdrop-filter:blur(20px);
-    overflow:hidden;
-}
-
-/* Header */
-.bx-chat-header {
-    display:flex; align-items:center; gap:12px;
-    padding:1rem 1.4rem;
-    background:rgba(0,212,255,.05);
-    border-bottom:1px solid rgba(0,212,255,.12);
-    flex-shrink:0;
-}
-.bx-chat-avatar {
-    width:44px;height:44px; border-radius:50%;
-    background:rgba(0,212,255,.1);
-    border:2px solid rgba(0,212,255,.3);
-    display:flex;align-items:center;justify-content:center;
-    overflow:hidden; flex-shrink:0;
-}
-.bx-chat-avatar img { width:34px; filter:drop-shadow(0 0 5px rgba(0,212,255,.5)); }
-.bx-chat-header-info { flex:1; }
-.bx-chat-name { font-family:'Orbitron',sans-serif; font-size:.88rem; font-weight:700; color:#E8F4FF; line-height:1; margin-bottom:3px; }
-.bx-chat-active { font-size:.72rem; color:#00FF88; display:flex; align-items:center; gap:5px; }
-.bx-active-dot { width:6px;height:6px;background:#00FF88;border-radius:50%;animation:statusPulse 1.5s ease infinite; }
-.bx-header-right { text-align:right; }
-.bx-badge-green { background:rgba(0,255,136,.15); color:#00FF88; border:1px solid rgba(0,255,136,.3); border-radius:20px; padding:3px 10px; font-size:.7rem; font-weight:700; }
-.bx-badge-yellow { background:rgba(255,180,0,.15); color:#FFB400; border:1px solid rgba(255,180,0,.3); border-radius:20px; padding:3px 10px; font-size:.7rem; font-weight:700; }
-.bx-clear-btn {
-    width:36px;height:36px; border-radius:10px;
-    background:rgba(255,255,255,.04);
-    border:1px solid rgba(0,212,255,.12);
-    color:rgba(180,210,255,.45);
-    display:flex;align-items:center;justify-content:center;
-    cursor:pointer; font-size:.9rem; transition:all .2s;
-}
-.bx-clear-btn:hover { background:rgba(255,75,106,.15); border-color:rgba(255,75,106,.3); color:#FF4B6A; }
-
-/* Messages */
-.bx-messages {
-    flex:1; overflow-y:auto;
-    padding:1.2rem;
-    display:flex; flex-direction:column; gap:.7rem;
-    scroll-behavior:smooth;
-}
-.bx-messages::-webkit-scrollbar { width:3px; }
-.bx-messages::-webkit-scrollbar-thumb { background:rgba(0,212,255,.2); border-radius:2px; }
-
-.bx-date-sep { display:flex;align-items:center;gap:10px;margin:.3rem 0; }
-.bx-date-sep::before,.bx-date-sep::after { content:'';flex:1;height:1px;background:rgba(0,212,255,.1); }
-.bx-date-sep span { font-size:.68rem;color:rgba(180,210,255,.35);font-weight:600;letter-spacing:.5px; }
-
-/* Message rows */
-.bx-msg-row { display:flex;align-items:flex-end;gap:8px; }
-.bx-user-row { flex-direction:row-reverse; }
-.bx-msg-animate { animation:bxMsgIn .35s cubic-bezier(.34,1.56,.64,1) both; }
-
-.bx-msg-avatar {
-    width:32px;height:32px;border-radius:50%;
-    display:flex;align-items:center;justify-content:center;
-    flex-shrink:0;overflow:hidden;
-}
-.bx-bot-av { background:rgba(0,212,255,.1); border:1.5px solid rgba(0,212,255,.25); }
-.bx-bot-av img { width:24px;filter:drop-shadow(0 0 4px rgba(0,212,255,.5)); }
-.bx-user-av {
-    background:rgba(0,255,136,.1); border:1.5px solid rgba(0,255,136,.25);
-    font-family:'Orbitron',sans-serif; font-size:.7rem; font-weight:700; color:#00FF88;
-}
-
-.bx-msg-wrap { display:flex;flex-direction:column;max-width:72%; }
-.bx-user-wrap { align-items:flex-end; }
-.bx-msg-sender { font-size:.68rem;font-weight:700;color:rgba(180,210,255,.4);margin-bottom:3px;padding:0 4px; }
-.bx-msg-time { font-size:.65rem;color:rgba(180,210,255,.25);margin-top:4px;padding:0 4px; }
-
-.bx-bubble {
-    padding:11px 15px; border-radius:16px;
-    font-size:.88rem; line-height:1.65;
-    word-break:break-word;
-}
-.bx-bot-bubble {
-    background:rgba(0,212,255,.07);
-    border:1px solid rgba(0,212,255,.16);
-    color:#E8F4FF;
-    border-bottom-left-radius:4px;
-}
-.bx-user-bubble {
-    background:linear-gradient(135deg,rgba(0,212,255,.22),rgba(0,144,200,.28));
-    border:1px solid rgba(0,212,255,.3);
-    color:#E8F4FF;
-    border-bottom-right-radius:4px;
-}
-
-/* Welcome bubble special */
-.bx-welcome-bubble {
-    background:linear-gradient(135deg,rgba(0,212,255,.1),rgba(0,255,136,.05));
-    border-color:rgba(0,212,255,.25);
-    position:relative;overflow:hidden;
-}
-.bx-welcome-bubble::before { content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#00D4FF,#00FF88); }
-.bx-welcome-tip { margin-top:10px;padding:8px 12px;background:rgba(0,212,255,.08);border-radius:9px;font-size:.78rem;color:rgba(180,210,255,.6);border-left:2px solid #00D4FF; }
-
-/* Typing */
-.bx-typing-bubble {
-    padding:12px 16px;
-    background:rgba(0,212,255,.07);
-    border:1px solid rgba(0,212,255,.16);
-    border-radius:16px;border-bottom-left-radius:4px;
-    display:flex;align-items:center;gap:5px;
-}
-.bx-typing-dot { width:7px;height:7px;background:#00D4FF;border-radius:50%;opacity:.5;animation:typingBounce 1.2s ease-in-out infinite; }
-.bx-typing-dot:nth-child(2){animation-delay:.2s;}
-.bx-typing-dot:nth-child(3){animation-delay:.4s;}
-
-/* Quick chips */
-.bx-chips {
-    display:flex;gap:6px;flex-wrap:wrap;
-    padding:.8rem 1.2rem .4rem;
-    border-top:1px solid rgba(0,212,255,.08);
-}
-.bx-chip {
-    padding:4px 12px;
-    background:rgba(0,212,255,.06);
-    border:1px solid rgba(0,212,255,.13);
-    border-radius:20px;
-    font-size:.74rem;color:rgba(180,210,255,.55);
-    cursor:pointer;font-weight:600;
-    transition:all .2s;white-space:nowrap;
-}
-.bx-chip:hover { background:rgba(0,212,255,.15);border-color:rgba(0,212,255,.4);color:#00D4FF;transform:translateY(-1px); }
-
-/* Input */
-.bx-input-area { padding:.9rem 1.2rem 1rem;border-top:1px solid rgba(0,212,255,.1);background:rgba(0,0,0,.12);flex-shrink:0; }
-.bx-input-row { display:flex;gap:8px;align-items:center; }
-.bx-input-field {
-    flex:1; padding:12px 18px;
-    background:rgba(0,212,255,.05);
-    border:1.5px solid rgba(0,212,255,.18);
-    border-radius:40px; color:#E8F4FF;
-    font-family:'Nunito',sans-serif; font-size:.9rem;
-    outline:none; transition:all .25s;
-}
-.bx-input-field::placeholder { color:rgba(180,210,255,.28); }
-.bx-input-field:focus { border-color:#00D4FF;background:rgba(0,212,255,.09);box-shadow:0 0 0 4px rgba(0,212,255,.08); }
-.bx-send-btn {
-    width:46px;height:46px;border-radius:50%;
-    background:linear-gradient(135deg,#00D4FF,#0090C8);
-    border:none;color:#060D1B;font-size:.95rem;
-    cursor:pointer;display:flex;align-items:center;justify-content:center;
-    transition:all .25s;flex-shrink:0;
-    box-shadow:0 0 18px rgba(0,212,255,.35);
-}
-.bx-send-btn:hover { transform:scale(1.1);box-shadow:0 0 30px rgba(0,212,255,.6); }
-.bx-send-btn:active { transform:scale(.95); }
-.bx-input-hint { text-align:center;margin-top:7px;font-size:.68rem;color:rgba(180,210,255,.22); }
-
-/* ── RIGHT PANEL ── */
-.bx-emergency-item { display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid rgba(0,212,255,.06); }
-.bx-emergency-item:last-child { border-bottom:none;padding-bottom:0; }
-.bx-e-icon { width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.82rem;flex-shrink:0; }
-.bx-e-title { font-size:.78rem;font-weight:700;color:#E8F4FF;margin-bottom:2px; }
-.bx-e-desc { font-size:.72rem;color:rgba(180,210,255,.5);line-height:1.4; }
-
-.bx-contact-item { display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:11px;background:rgba(0,212,255,.04);border:1px solid rgba(0,212,255,.08);margin-bottom:6px;transition:all .2s; }
-.bx-contact-item:hover { background:rgba(0,212,255,.1);border-color:rgba(0,212,255,.22);transform:translateX(3px); }
-.bx-contact-icon { width:28px;height:28px;background:rgba(0,212,255,.12);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#00D4FF;font-size:.75rem;flex-shrink:0; }
-.bx-contact-name { font-size:.78rem;font-weight:700;color:#E8F4FF; }
-.bx-contact-phone { font-size:.7rem;color:rgba(180,210,255,.45); }
-.bx-call-btn { width:26px;height:26px;border-radius:50%;background:rgba(0,255,136,.12);border:1px solid rgba(0,255,136,.2);color:#00FF88;display:flex;align-items:center;justify-content:center;font-size:.68rem;text-decoration:none;margin-left:auto;flex-shrink:0;transition:all .2s; }
-.bx-call-btn:hover { background:#00FF88;color:#060D1B; }
-.bx-dir-link { display:flex;align-items:center;justify-content:center;gap:6px;margin-top:10px;padding:8px;background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.15);border-radius:10px;color:#00D4FF;font-size:.78rem;font-weight:700;text-decoration:none;transition:all .2s; }
-.bx-dir-link:hover { background:rgba(0,212,255,.15);color:#00D4FF; }
-
-.bx-fact-item { display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid rgba(0,212,255,.05);font-size:.78rem;color:rgba(180,210,255,.5); }
-.bx-fact-item:last-child { border-bottom:none; }
-.bx-fact-item span { font-size:.95rem; }
-
-/* ── RESPONSIVE ── */
-@media(max-width:1100px){
-    .bx-layout { grid-template-columns:240px 1fr; }
-    .bx-right-panel { display:none; }
-}
-@media(max-width:720px){
-    .bx-layout { grid-template-columns:1fr; }
-    .bx-left-panel { display:none; }
-    .bx-chat-page { padding:.8rem; }
-    .bx-chat-window { height:calc(100vh - 100px); }
-}
-</style>
-
 {% endblock %}

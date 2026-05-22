@@ -1,680 +1,270 @@
 {% extends 'base.html' %}
 {% load static %}
 
+{% block body_class %}bx-page-home{% endblock %}
+{% block extra_css %}
+<link href="{% static 'css/hero-video.css' %}" rel="stylesheet">
+{% endblock %}
+
 {% block content %}
-<!-- Hero Section with animated gradient background and floating elements -->
-<section class="hero-section py-5" id="hero">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-lg-6 text-center text-lg-start fade-up">
-                <h1 class="display-4 fw-bold mb-3">Hi, I'm <span class="text-danger gradient-text">Baymax</span>!</h1>
-                <p class="lead mb-3">Your AI-powered health buddy, here to care, predict, and assist!</p>
-                <div class="mt-4">
+<section class="bx-hero-video-land" id="top">
+    <div class="bx-hero-video-bg">
+        <video id="bx-hero-bg-video" preload="auto" playsinline muted autoplay loop poster="{% static 'images/blobax2.png' %}">
+            <source src="{% static 'videos/blobax_intro_video.mp4' %}" type="video/mp4">
+        </video>
+    </div>
+    <div class="bx-hero-grid" aria-hidden="true"></div>
+    <div class="bx-hero-video-shade"></div>
+    <button type="button" class="bx-hero-mute-btn" id="bx-hero-mute-btn" aria-label="Toggle sound" title="Turn sound on">
+        <i class="fas fa-volume-xmark"></i>
+    </button>
+
+    <div class="container bx-hero-video-inner">
+        <div class="row align-items-center g-4 w-100">
+            <div class="col-lg-7">
+                <p class="bx-hero-vid-eyebrow bx-reveal">AI-Powered Health Intelligence</p>
+                <h1 class="bx-hero-vid-title bx-reveal">
+                    Your Personal AI Health Companion — Built for <em>Bangladesh</em>
+                </h1>
+                <p class="bx-hero-vid-desc bx-reveal">
+                    Blobax combines machine learning disease prediction, emergency AI guidance, and private health tracking — so you can understand your health with tools made for Bangladesh.
+                </p>
+                <div class="bx-hero-vid-actions d-flex flex-wrap bx-reveal">
                     {% if user.is_authenticated %}
-                        <a href="{% url 'dashboard:home' %}" class="btn btn-light btn-lg me-3 shadow btn-hover-glow">Go to Dashboard</a>
+                    <a href="{% url 'dashboard:home' %}" class="bx-btn bx-btn-primary">Dashboard</a>
+                    <a href="{% url 'emergency:home' %}" class="bx-btn bx-btn-outline">Assistant</a>
                     {% else %}
-                        <a href="{% url 'users:register' %}" class="btn btn-light btn-lg me-3 shadow btn-hover-glow">Get Started</a>
-                        <a href="{% url 'users:login' %}" class="btn btn-outline-primary btn-lg shadow btn-hover-glow-outline">Login</a>
+                    <a href="{% url 'users:register' %}" class="bx-btn bx-btn-primary">Get Started</a>
+                    <a href="{% url 'users:login' %}" class="bx-btn bx-btn-outline">Sign In</a>
+                    {% endif %}
+                </div>
+                <div class="bx-hero-vid-progress bx-reveal mt-4">
+                    <div class="bar"><div class="bar-fill"></div></div>
+                    <span class="slide-num">01</span>
+                </div>
+            </div>
+            <div class="col-lg-5 text-center d-none d-lg-block bx-reveal">
+                <img src="{% static 'images/blobax2.png' %}" class="bx-float-anim img-fluid" style="max-width:min(380px,100%)" alt="Blobax AI" onerror="this.style.display='none'">
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="about" class="bx-land-section position-relative">
+    <div class="bx-glow-orb" style="left:-80px;top:20%"></div>
+    <div class="container position-relative">
+        <div class="row align-items-center g-4">
+            <div class="col-lg-5 bx-reveal">
+                <img src="{% static 'images/blobax3.png' %}" class="img-fluid rounded-4 bx-float-slow" alt="Blobax" style="box-shadow:var(--bx-glow)" onerror="this.style.display='none'">
+            </div>
+            <div class="col-lg-7 bx-reveal">
+                <div class="bx-about-card">
+                    <p class="bx-section-num">01 — About Blobax</p>
+                    <h2 class="bx-land-title">Healthcare AI with heart</h2>
+                    <p class="bx-lead">Blobax is an AI-powered health web app built by <strong>Md. Ragib Hasan</strong>, a Computer Science and Engineering student at Sylhet Engineering College.</p>
+                    <p class="bx-lead">Inspired by Big Hero 6, Blobax brings compassionate AI to everyday healthcare — making ML-based disease prediction, emergency assistance, and health tracking accessible to everyone in Bangladesh.</p>
+                    <a href="{% url 'users:register' %}" class="bx-btn bx-btn-primary">Create free account</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="features" class="bx-land-section bx-section-alt">
+    <div class="container">
+        <div class="text-center mb-4 bx-reveal">
+            <p class="bx-section-num">02 — What Blobax can do</p>
+            <h2 class="bx-land-title">Precision health tools</h2>
+            <p class="bx-lead mx-auto">Live ML models, emergency chat, doctor directory, and personal health tracking.</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-4 bx-reveal">
+                <div class="bx-card h-100">
+                    <div class="bx-card-icon"><i class="fas fa-syringe"></i></div>
+                    <h5 class="fw-bold">ML Predictions</h5>
+                    <p class="small text-muted">Diabetes, heart &amp; liver risk — Random Forest &amp; XGBoost models.</p>
+                    <span class="bx-badge-live">Live</span>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4 bx-reveal">
+                <div class="bx-card h-100">
+                    <div class="bx-card-icon"><i class="fas fa-comment-medical"></i></div>
+                    <h5 class="fw-bold">Emergency AI</h5>
+                    <p class="small text-muted">Gemini-powered chat for guidance and first aid.</p>
+                    <span class="bx-badge-live">Live</span>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4 bx-reveal">
+                <div class="bx-card h-100">
+                    <div class="bx-card-icon"><i class="fas fa-user-doctor"></i></div>
+                    <h5 class="fw-bold">Doctor Directory</h5>
+                    <p class="small text-muted">400+ verified providers across Bangladesh.</p>
+                    <span class="bx-badge-live">Live</span>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4 bx-reveal">
+                <div class="bx-card h-100">
+                    <div class="bx-card-icon"><i class="fas fa-weight-scale"></i></div>
+                    <h5 class="fw-bold">BMI Calculator</h5>
+                    <p class="small text-muted">Instant BMI with history in your report.</p>
+                    <span class="bx-badge-live">Live</span>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4 bx-reveal">
+                <div class="bx-card h-100">
+                    <div class="bx-card-icon"><i class="fas fa-heart-pulse"></i></div>
+                    <h5 class="fw-bold">Health Tracking</h5>
+                    <p class="small text-muted">Log BP, glucose, weight &amp; more — view trends on your profile.</p>
+                    <span class="bx-badge-live">Live</span>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4 bx-reveal">
+                <div class="bx-card h-100">
+                    <div class="bx-card-icon"><i class="fas fa-file-prescription"></i></div>
+                    <h5 class="fw-bold">Prescription OCR</h5>
+                    <p class="small text-muted mb-0">Handwritten Rx reading — coming soon.</p>
+                    <span class="bx-badge-ml">Soon</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="how" class="bx-land-section">
+    <div class="container">
+        <div class="text-center mb-5 bx-reveal">
+            <p class="bx-section-num">03 — How it works</p>
+            <h2 class="bx-land-title">Three simple steps</h2>
+        </div>
+        <div class="row g-4 bx-how-steps">
+            <div class="col-md-4 bx-reveal">
+                <div class="bx-how-card">
+                    <span class="bx-how-num">01</span>
+                    <div class="bx-card-icon mx-auto"><i class="fas fa-user-plus"></i></div>
+                    <h5 class="fw-bold">Create Account</h5>
+                    <p class="small text-muted mb-0">Sign up with Google or email in under a minute.</p>
+                </div>
+            </div>
+            <div class="col-md-4 bx-reveal">
+                <div class="bx-how-card">
+                    <span class="bx-how-num">02</span>
+                    <div class="bx-card-icon mx-auto"><i class="fas fa-brain"></i></div>
+                    <h5 class="fw-bold">Run AI Checks</h5>
+                    <p class="small text-muted mb-0">Use ML models for diabetes, heart &amp; liver prediction.</p>
+                </div>
+            </div>
+            <div class="col-md-4 bx-reveal">
+                <div class="bx-how-card">
+                    <span class="bx-how-num">03</span>
+                    <div class="bx-card-icon mx-auto"><i class="fas fa-chart-line"></i></div>
+                    <h5 class="fw-bold">Track Progress</h5>
+                    <p class="small text-muted mb-0">Monitor vitals and view trends on your private dashboard.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="stats" class="bx-stats-strip py-5">
+    <div class="container">
+        <div class="text-center mb-4 bx-reveal">
+            <p class="bx-section-num">04 — By the numbers</p>
+            <h2 class="bx-land-title">Trusted at scale</h2>
+        </div>
+        <div class="row g-4">
+            <div class="col-6 col-lg-3 bx-reveal">
+                <div class="bx-stat-dark"><div class="val" data-counter="400" data-suffix="+">0</div><div class="lbl">Doctors</div></div>
+            </div>
+            <div class="col-6 col-lg-3 bx-reveal">
+                <div class="bx-stat-dark"><div class="val" data-counter="6">0</div><div class="lbl">Health tools</div></div>
+            </div>
+            <div class="col-6 col-lg-3 bx-reveal">
+                <div class="bx-stat-dark"><div class="val" data-counter="24">0</div><div class="lbl">Hours AI support</div></div>
+            </div>
+            <div class="col-6 col-lg-3 bx-reveal">
+                <div class="bx-stat-dark"><div class="val" data-counter="100" data-suffix="%">0</div><div class="lbl">Data privacy</div></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="builder" class="bx-land-section">
+    <div class="container">
+        <div class="bx-builder-card bx-reveal">
+            <div class="bx-builder-avatar">
+                <img src="{% static 'images/blobax5.png' %}" alt="Ragib Hasan" class="bx-float-slow" onerror="this.classList.add('d-none');this.nextElementSibling.classList.add('d-flex')">
+                <div class="bx-builder-initials">RH</div>
+            </div>
+            <div class="bx-builder-info">
+                <p class="bx-eyebrow">Meet the Builder</p>
+                <h2 class="bx-land-title h3">Md. Ragib Hasan</h2>
+                <p class="mb-2">BSC in Computer Science and Engineering · Sylhet Engineering College</p>
+                <p class="bx-muted-text">
+                    Passionate about building real-world AI systems that improve lives.
+                    Blobax combines machine learning, Django, and modern UI design to deliver healthcare tools for Bangladesh.
+                </p>
+                <div class="bx-builder-links d-flex flex-wrap gap-2 mt-3">
+                    <a href="https://ragibh.github.io/" target="_blank" rel="noopener" class="bx-btn bx-btn-outline btn-sm"><i class="fas fa-globe me-2"></i>Portfolio</a>
+                    <a href="https://github.com/RagibH" target="_blank" rel="noopener" class="bx-btn bx-btn-outline btn-sm"><i class="fab fa-github me-2"></i>GitHub</a>
+                    <a href="https://www.linkedin.com/in/ragib-hasan-828316317/" target="_blank" rel="noopener" class="bx-btn bx-btn-outline btn-sm"><i class="fab fa-linkedin me-2"></i>LinkedIn</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="contact" class="bx-land-section bx-section-alt">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 text-center bx-reveal">
+                <p class="bx-eyebrow">Get In Touch</p>
+                <h2 class="bx-land-title">Say Hello</h2>
+                <p class="bx-muted-text mb-4">Questions, feedback, or collaboration — message goes to ragibhasan53@gmail.com.</p>
+            </div>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-lg-6 bx-reveal">
+                <div class="bx-form-card">
+                    {% if contact_sent %}
+                    <div class="bx-contact-success text-center py-4">
+                        <i class="fas fa-circle-check fa-2x mb-3" style="color:var(--bx-accent)"></i>
+                        <h4>Message Sent!</h4>
+                        <p class="bx-muted-text mb-0">Thanks for reaching out. I'll reply to your email soon.</p>
+                    </div>
+                    {% else %}
+                    <form method="post" action="{% url 'home' %}">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="bx-label">Your Name</label>
+                            <input type="text" name="sender_name" class="bx-input" placeholder="e.g. John Doe" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="bx-label">Your Email</label>
+                            <input type="email" name="sender_email" class="bx-input" placeholder="e.g. you@example.com" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="bx-label">Subject</label>
+                            <input type="text" name="subject" class="bx-input" placeholder="e.g. Feedback on Blobax" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="bx-label">Message</label>
+                            <textarea name="body" rows="5" class="bx-input" placeholder="Your message here..." required></textarea>
+                        </div>
+                        <button type="submit" class="bx-btn bx-btn-primary w-100">
+                            <i class="fas fa-paper-plane me-2"></i>Send Message
+                        </button>
+                    </form>
                     {% endif %}
                 </div>
             </div>
-            <div class="col-lg-6 text-center mt-4 mt-lg-0 fade-up delay-1">
-                <div class="floating-baymax">
-                    <img src="{% static 'images/baymax2.png' %}" class="img-fluid rounded hero-img" style="max-height: 350px;" alt="Baymax Hero">
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Animated wave divider -->
-    <div class="wave-divider">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320">
-            <path fill="#fff3fe" fill-opacity="1" d="M0,224L48,213.3C96,203,192,181,288,181.3C384,181,480,203,576,213.3C672,224,768,224,864,208C960,192,1056,160,1152,154.7C1248,149,1344,171,1392,181.3L1440,192L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
-        </svg>
-    </div>
-</section>
-
-<!-- About Section with scroll reveal -->
-<section id="about" class="py-5" style="background-color: #fff3fe;">
-    <div class="container">
-        <h2 class="fw-bold text-center mb-5 section-title">About Baymax</h2>
-        <div class="row align-items-center">
-            <!-- Image on the left -->
-            <div class="col-lg-5 text-center mb-4 mb-lg-0 slide-in-left">
-                <div class="image-hover-zoom">
-                    <img src="{% static 'images/baymax6.png' %}" class="img-fluid rounded shadow" style="max-height: 400px;" alt="Baymax About">
-                </div>
-            </div>
-            <!-- Text on the right -->
-            <div class="col-lg-7 slide-in-right">
-                <p class="lead" style="text-align: justify;">
-                    Baymax is inspired by Disney's Big Hero 6 — a compassionate, adorable AI healthcare companion.
-                    This project was built to bring Baymax's caring personality to life digitally, helping with health predictions, emergency guidance, and reading handwritten prescriptions.
-                </p>
-                <p class="lead" style="text-align: justify;">
-                    <strong>About the creator:</strong> I'm Ragib Hasan, a student at Sylhet Engineering College, passionate about AI and healthcare technology.
-                    I built Baymax to make health tools friendly, accessible, and cute!
-                </p>
-                <div class="mt-3">
-                    <div class="d-flex gap-3 flex-wrap">
-                        <div class="badge-creator">
-                            <i class="fas fa-graduation-cap me-1"></i> Sylhet Engineering College
-                        </div>
-                        <div class="badge-creator">
-                            <i class="fas fa-heartbeat me-1"></i> AI Healthcare Enthusiast
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 </section>
+{% endblock %}
 
-<!-- Features Section with animated cards -->
-<section id="features" class="py-5">
-    <div class="container text-center">
-        <h2 class="fw-bold mb-5 section-title">Baymax Features</h2>
-        <div class="row g-4">
-            <!-- Feature 1 -->
-            <div class="col-md-4 fade-up">
-                <div class="card h-100 shadow-lg feature-card" style="background-color: #f5e3f3;">
-                    <div class="card-body">
-                        <!-- Animated SVG icon -->
-                        <div class="feature-icon">
-                            <svg width="50" height="50" viewBox="0 0 24 24" fill="#FF6B6B" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10
-                                    10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8
-                                    8-8 8 3.59 8 8-3.59 8-8 8z"/>
-                                <path d="M0 0h24v24H0z" fill="none"/>
-                            </svg>
-                        </div>
-                        <h5 class="fw-bold mb-2 mt-2">AI Health Predictions</h5>
-                        <p>Predict diabetes, heart disease, liver, kidney issues, and BMI analysis accurately.</p>
-                        <div class="feature-baymax-img">
-                            <img src="{% static 'images/baymax5.png' %}" width="60" class="mt-2 bounce-img" alt="Baymax Feature">
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- Feature 2 -->
-            <div class="col-md-4 fade-up delay-1">
-                <div class="card h-100 shadow-lg feature-card" style="background-color: #D0EBFF;">
-                    <div class="card-body">
-                        <div class="feature-icon">
-                            <svg width="50" height="50" viewBox="0 0 24 24" fill="#1E3A8A" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2
-                                    2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2
-                                    14H7v-2h10v2zm0-4H7v-2h10v2zm0-4H7V7h10v2z"/>
-                                <path d="M0 0h24v24H0z" fill="none"/>
-                            </svg>
-                        </div>
-                        <h5 class="fw-bold mb-2 mt-2">Prescription Recognition</h5>
-                        <p>Scan and read handwritten prescriptions with AI OCR technology.</p>
-                        <div class="feature-baymax-img">
-                            <img src="{% static 'images/baymax3.png' %}" width="60" class="mt-2 bounce-img" alt="Baymax Feature">
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- Feature 3 -->
-            <div class="col-md-4 fade-up delay-2">
-                <div class="card h-100 shadow-lg feature-card" style="background-color: #dec6ff;">
-                    <div class="card-body">
-                        <div class="feature-icon">
-                            <svg width="50" height="50" viewBox="0 0 24 24" fill="#FFB400" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4
-                                    1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8
-                                    4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                                <path d="M0 0h24v24H0z" fill="none"/>
-                            </svg>
-                        </div>
-                        <h5 class="fw-bold mb-2 mt-2">First Aid Chatbot</h5>
-                        <p>Instant guidance for minor injuries and emergency support.</p>
-                        <div class="feature-baymax-img">
-                            <img src="{% static 'images/baymax2.png' %}" width="60" class="mt-2 bounce-img" alt="Baymax Feature">
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="row g-4 mt-4">
-            <!-- Feature 4 -->
-            <div class="col-md-4 mx-auto fade-up">
-                <div class="card h-100 shadow-lg feature-card" style="background-color: #FFE5D9;">
-                    <div class="card-body">
-                        <div class="feature-icon">
-                            <svg width="50" height="50" viewBox="0 0 24 24" fill="#28A745" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4
-                                    1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8
-                                    4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                                <path d="M0 0h24v24H0z" fill="none"/>
-                            </svg>
-                        </div>
-                        <h5 class="fw-bold mb-2 mt-2">Emergency Directory</h5>
-                        <p>Find doctors by specialization and nearby hospitals.</p>
-                        <div class="feature-baymax-img">
-                            <img src="{% static 'images/baymax1.png' %}" width="60" class="mt-2 bounce-img" alt="Baymax Feature">
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Stats Section with counters -->
-<section id="stats" class="py-5 stats-section" style="background: linear-gradient(135deg, #ffc1a5, #f6bfe6);">
-    <div class="container text-center">
-        <h2 class="fw-bold mb-5 section-title text-white">Health Statistics</h2>
-        <div class="row g-4">
-            <div class="col-md-3 fade-up">
-                <div class="card p-4 shadow stat-card" style="border-radius: 25px; background-color: #D0EBFF;">
-                    <h3 class="text-primary counter" data-target="1000">0</h3>
-                    <p class="fw-semibold">Predictions Made</p>
-                    <i class="fas fa-chart-line stat-icon"></i>
-                </div>
-            </div>
-            <div class="col-md-3 fade-up delay-1">
-                <div class="card p-4 shadow stat-card" style="border-radius: 25px; background-color: #FFF3BF;">
-                    <h3 class="text-success counter" data-target="95">0%</h3>
-                    <p class="fw-semibold">Prediction Accuracy</p>
-                    <i class="fas fa-tachometer-alt stat-icon"></i>
-                </div>
-            </div>
-            <div class="col-md-3 fade-up delay-2">
-                <div class="card p-4 shadow stat-card" style="border-radius: 25px; background-color: #efe9f8;">
-                    <h3 class="text-warning counter" data-target="500">0</h3>
-                    <p class="fw-semibold">Active Users</p>
-                    <i class="fas fa-users stat-icon"></i>
-                </div>
-            </div>
-            <div class="col-md-3 fade-up delay-3">
-                <div class="card p-4 shadow stat-card" style="border-radius: 25px; background-color: #E2F0CB;">
-                    <h3 class="text-danger"><span class="counter" data-target="24">0</span>/7</h3>
-                    <p class="fw-semibold">Emergency Support</p>
-                    <i class="fas fa-phone-alt stat-icon"></i>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Contact Section with animated card -->
-<section id="contact" class="py-5" style="background-color: #ebf4ff;">
-    <div class="container text-center">
-        <h2 class="fw-bold mb-4 section-title">Contact Me</h2>
-        <div class="card mx-auto shadow-lg contact-card" style="max-width: 500px; border-radius: 25px; background-color: #f6d7f2;">
-            <div class="card-body">
-                <div class="contact-avatar mb-3">
-                    <i class="fas fa-user-circle fa-4x text-primary"></i>
-                </div>
-                <h5 class="fw-bold mb-3">Ragib Hasan</h5>
-                <p><i class="fas fa-envelope me-2 text-danger"></i> <a href="mailto:ragibhasansec@gmail.com">ragibhasansec@gmail.com</a></p>
-                <p><i class="fas fa-phone-alt me-2 text-success"></i> <a href="tel:+8801903156620">+8801903156620</a></p>
-                <p><i class="fas fa-map-marker-alt me-2 text-warning"></i> Mirpur, Dhaka, Bangladesh</p>
-                <p><i class="fas fa-university me-2 text-info"></i> Sylhet Engineering College</p>
-                <div class="social-links mt-3">
-                    <a href="#" class="social-icon"><i class="fab fa-github"></i></a>
-                    <a href="#" class="social-icon"><i class="fab fa-linkedin"></i></a>
-                    <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Baymax Greeting Audio -->
-<audio id="baymaxGreeting" preload="auto">
-    <source src="{% static 'audio/baymax-greetings.mp3' %}" type="audio/mpeg">
-    Your browser does not support the audio element.
-</audio>
-
-<style>
-    /* Additional CSS for animations and modern effects */
-    @keyframes fadeUp {
-        from {
-            opacity: 0;
-            transform: translateY(30px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-    
-    @keyframes slideInLeft {
-        from {
-            opacity: 0;
-            transform: translateX(-50px);
-        }
-        to {
-            opacity: 1;
-            transform: translateX(0);
-        }
-    }
-    
-    @keyframes slideInRight {
-        from {
-            opacity: 0;
-            transform: translateX(50px);
-        }
-        to {
-            opacity: 1;
-            transform: translateX(0);
-        }
-    }
-    
-    @keyframes float {
-        0% { transform: translateY(0px); }
-        50% { transform: translateY(-20px); }
-        100% { transform: translateY(0px); }
-    }
-    
-    @keyframes bounce {
-        0%, 100% { transform: translateY(0); }
-        50% { transform: translateY(-10px); }
-    }
-    
-    @keyframes pulse-glow {
-        0% { box-shadow: 0 0 0 0 rgba(255,107,107,0.4); }
-        70% { box-shadow: 0 0 0 15px rgba(255,107,107,0); }
-        100% { box-shadow: 0 0 0 0 rgba(255,107,107,0); }
-    }
-    
-    /* Hero Section Animation */
-    .hero-section {
-        background: linear-gradient(135deg, #c2d3e0, #ffd2bd);
-        position: relative;
-        overflow: hidden;
-        animation: gradientShift 8s ease infinite;
-        background-size: 200% 200%;
-    }
-    
-    @keyframes gradientShift {
-        0% { background-position: 0% 50%; }
-        50% { background-position: 100% 50%; }
-        100% { background-position: 0% 50%; }
-    }
-    
-    .gradient-text {
-        background: linear-gradient(45deg, #dc3545, #ff6b6b);
-        -webkit-background-clip: text;
-        background-clip: text;
-        color: transparent;
-        animation: shimmer 3s ease infinite;
-    }
-    
-    @keyframes shimmer {
-        0% { background-position: -100% 0; }
-        100% { background-position: 200% 0; }
-    }
-    
-    .gradient-text {
-        background-size: 200% auto;
-    }
-    
-    .floating-baymax {
-        animation: float 4s ease-in-out infinite;
-    }
-    
-    .hero-img {
-        transition: transform 0.3s ease;
-        filter: drop-shadow(0 10px 20px rgba(0,0,0,0.2));
-    }
-    
-    .hero-img:hover {
-        transform: scale(1.02);
-    }
-    
-    .wave-divider {
-        position: absolute;
-        bottom: -1px;
-        left: 0;
-        width: 100%;
-        overflow: hidden;
-        line-height: 0;
-    }
-    
-    .wave-divider svg {
-        width: 100%;
-        height: 60px;
-    }
-    
-    /* Fade Up animation classes */
-    .fade-up {
-        opacity: 0;
-        animation: fadeUp 0.8s ease forwards;
-    }
-    
-    .slide-in-left {
-        opacity: 0;
-        animation: slideInLeft 0.8s ease forwards;
-    }
-    
-    .slide-in-right {
-        opacity: 0;
-        animation: slideInRight 0.8s ease forwards;
-    }
-    
-    .delay-1 { animation-delay: 0.2s; }
-    .delay-2 { animation-delay: 0.4s; }
-    .delay-3 { animation-delay: 0.6s; }
-    
-    /* Section Titles */
-    .section-title {
-        position: relative;
-        display: inline-block;
-        padding-bottom: 15px;
-    }
-    
-    .section-title:after {
-        content: '';
-        position: absolute;
-        bottom: 0;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 60px;
-        height: 4px;
-        background: linear-gradient(90deg, #FF6B6B, #FFB400);
-        border-radius: 2px;
-        animation: titleGrow 0.6s ease-out;
-    }
-    
-    @keyframes titleGrow {
-        from { width: 0; }
-        to { width: 60px; }
-    }
-    
-    /* Feature Cards */
-    .feature-card {
-        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        border: none;
-        overflow: hidden;
-        position: relative;
-    }
-    
-    .feature-card:hover {
-        transform: translateY(-15px) scale(1.02);
-        box-shadow: 0 20px 40px rgba(0,0,0,0.15);
-    }
-    
-    .feature-card:before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-        transition: left 0.5s ease;
-    }
-    
-    .feature-card:hover:before {
-        left: 100%;
-    }
-    
-    .feature-icon svg {
-        transition: transform 0.3s ease;
-    }
-    
-    .feature-card:hover .feature-icon svg {
-        transform: scale(1.1) rotate(5deg);
-    }
-    
-    .bounce-img {
-        transition: transform 0.3s ease;
-    }
-    
-    .feature-card:hover .bounce-img {
-        animation: bounce 0.5s ease;
-    }
-    
-    /* Button Effects */
-    .btn-hover-glow {
-        transition: all 0.3s ease;
-    }
-    
-    .btn-hover-glow:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-        filter: brightness(1.05);
-    }
-    
-    .btn-hover-glow-outline {
-        transition: all 0.3s ease;
-    }
-    
-    .btn-hover-glow-outline:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-        background-color: rgba(13,110,253,0.05);
-    }
-    
-    /* Stats Cards */
-    .stat-card {
-        transition: all 0.3s ease;
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .stat-card:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 15px 35px rgba(0,0,0,0.2);
-    }
-    
-    .stat-icon {
-        position: absolute;
-        bottom: 10px;
-        right: 15px;
-        font-size: 2rem;
-        opacity: 0.15;
-        transition: all 0.3s ease;
-    }
-    
-    .stat-card:hover .stat-icon {
-        opacity: 0.3;
-        transform: scale(1.1);
-    }
-    
-    /* Image Hover Zoom */
-    .image-hover-zoom {
-        overflow: hidden;
-        border-radius: 15px;
-    }
-    
-    .image-hover-zoom img {
-        transition: transform 0.5s ease;
-    }
-    
-    .image-hover-zoom:hover img {
-        transform: scale(1.05);
-    }
-    
-    /* Contact Card */
-    .contact-card {
-        transition: all 0.4s ease;
-        border: none;
-    }
-    
-    .contact-card:hover {
-        transform: translateY(-10px);
-        box-shadow: 0 25px 40px rgba(0,0,0,0.2);
-    }
-    
-    .contact-avatar i {
-        transition: transform 0.3s ease;
-    }
-    
-    .contact-card:hover .contact-avatar i {
-        transform: scale(1.1);
-    }
-    
-    .social-links {
-        display: flex;
-        justify-content: center;
-        gap: 15px;
-    }
-    
-    .social-icon {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        background: rgba(0,0,0,0.05);
-        color: #1E3A8A;
-        transition: all 0.3s ease;
-        font-size: 1.2rem;
-        text-decoration: none;
-    }
-    
-    .social-icon:hover {
-        background: linear-gradient(135deg, #FF6B6B, #FFB400);
-        color: white;
-        transform: translateY(-3px);
-        box-shadow: 0 5px 15px rgba(255,107,107,0.4);
-    }
-    
-    /* Badge Creator */
-    .badge-creator {
-        display: inline-flex;
-        align-items: center;
-        padding: 8px 16px;
-        background: rgba(255,107,107,0.1);
-        border-radius: 30px;
-        font-size: 0.9rem;
-        font-weight: 500;
-        color: #dc3545;
-    }
-    
-    /* Stats Counter */
-    .counter {
-        font-size: 2.5rem;
-        font-weight: 700;
-    }
-    
-    /* Scroll Reveal Animation Trigger */
-    @media (prefers-reduced-motion: reduce) {
-        .fade-up, .slide-in-left, .slide-in-right {
-            animation: none;
-            opacity: 1;
-        }
-    }
-    
-    /* Responsive adjustments */
-    @media (max-width: 768px) {
-        .stat-card h3 {
-            font-size: 1.8rem;
-        }
-        .section-title {
-            font-size: 1.8rem;
-        }
-        .hero-section .display-4 {
-            font-size: 2rem;
-        }
-    }
-</style>
-
-<script>
-    // Counter animation for stats
-    function animateCounter(element, target, hasPercent = false) {
-        let start = 0;
-        const duration = 2000;
-        const increment = target / (duration / 16);
-        
-        const updateCounter = () => {
-            start += increment;
-            if (start < target) {
-                element.innerText = hasPercent ? Math.floor(start) + '%' : Math.floor(start);
-                requestAnimationFrame(updateCounter);
-            } else {
-                element.innerText = hasPercent ? target + '%' : target;
-            }
-        };
-        updateCounter();
-    }
-    
-    // Intersection Observer for counters
-    const observerOptions = {
-        threshold: 0.5,
-        rootMargin: "0px"
-    };
-    
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                const counterElement = entry.target;
-                const target = parseInt(counterElement.getAttribute('data-target'));
-                const hasPercent = counterElement.innerText.includes('%');
-                animateCounter(counterElement, target, hasPercent);
-                observer.unobserve(counterElement);
-            }
-        });
-    }, observerOptions);
-    
-    // Observe all counter elements
-    document.querySelectorAll('.counter').forEach(counter => {
-        observer.observe(counter);
-    });
-    
-    // Scroll reveal for fade-up elements
-    const revealElements = document.querySelectorAll('.fade-up, .slide-in-left, .slide-in-right');
-    const revealObserver = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.style.animationPlayState = 'running';
-                revealObserver.unobserve(entry.target);
-            }
-        });
-    }, { threshold: 0.1 });
-    
-    revealElements.forEach(el => {
-        el.style.animationPlayState = 'paused';
-        revealObserver.observe(el);
-    });
-    
-    // Baymax greeting audio with improved handling
-    window.addEventListener('load', function () {
-        // Play greeting only once per session
-        if (!sessionStorage.getItem('baymaxGreetingPlayed')) {
-            const audio = document.getElementById('baymaxGreeting');
-            if (audio) {
-                audio.volume = 0.6;
-                const playPromise = audio.play();
-                if (playPromise !== undefined) {
-                    playPromise.then(() => {
-                        sessionStorage.setItem('baymaxGreetingPlayed', 'true');
-                    }).catch(() => {
-                        console.log("Baymax greeting autoplay blocked - user interaction required");
-                        // Add click anywhere to play greeting
-                        document.body.addEventListener('click', function playOnClick() {
-                            audio.play().then(() => {
-                                sessionStorage.setItem('baymaxGreetingPlayed', 'true');
-                            }).catch(e => console.log("Still blocked:", e));
-                            document.body.removeEventListener('click', playOnClick);
-                        }, { once: true });
-                    });
-                }
-            }
-        }
-    });
-    
-    // Parallax effect on hero image
-    window.addEventListener('scroll', () => {
-        const scrolled = window.pageYOffset;
-        const heroImg = document.querySelector('.hero-img');
-        if (heroImg) {
-            heroImg.style.transform = `translateY(${scrolled * 0.1}px)`;
-        }
-    });
-    
-    // Add smooth hover effect for cards
-    document.querySelectorAll('.feature-card, .stat-card').forEach(card => {
-        card.addEventListener('mouseenter', function(e) {
-            this.style.transition = 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
-        });
-    });
-</script>
-
+{% block scripts %}
+<script src="{% static 'js/hero-video.js' %}"></script>
+{% if contact_sent %}
+<script>if (location.hash !== '#contact') location.hash = 'contact';</script>
+{% endif %}
 {% endblock %}

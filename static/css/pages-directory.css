@@ -1,0 +1,218 @@
+/* Doctor directory */
+.bx-dir-page {
+    max-width: var(--bx-container, 1080px);
+    margin: 0 auto;
+    padding: 1.25rem 1rem 3rem;
+}
+
+.bx-dir-hero {
+    text-align: center;
+    padding: 1.5rem 1rem 2rem;
+    margin-bottom: 1.5rem;
+    background: rgba(13, 17, 23, 0.6);
+    border: 1px solid var(--bx-border);
+    border-radius: var(--bx-radius-lg);
+}
+
+.bx-dir-hero h1 {
+    font-family: var(--bx-font-display);
+    font-size: var(--bx-h1, clamp(1.35rem, 2.5vw, 1.85rem));
+    margin-bottom: 0.35rem;
+}
+
+.bx-dir-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.75rem;
+    max-width: 640px;
+    margin: 1.25rem auto 0;
+}
+
+.bx-dir-stat {
+    padding: 0.75rem;
+    background: var(--bx-surface-2);
+    border: 1px solid var(--bx-border);
+    border-radius: 12px;
+}
+
+.bx-dir-stat .n {
+    font-family: var(--bx-font-display);
+    font-size: 1.35rem;
+    font-weight: 700;
+    background: var(--bx-gradient-text);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.bx-dir-stat .l {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--bx-muted);
+}
+
+.bx-dir-filters {
+    position: sticky;
+    top: 72px;
+    z-index: 20;
+    background: rgba(5, 8, 16, 0.92);
+    backdrop-filter: blur(16px);
+    border: 1px solid var(--bx-border);
+    border-radius: var(--bx-radius);
+    padding: 1.25rem;
+    margin-bottom: 1.5rem;
+}
+
+.bx-dir-filters .form-label {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--bx-muted);
+    margin-bottom: 0.35rem;
+}
+
+.bx-dir-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+}
+
+.bx-dir-pill {
+    padding: 0.35rem 0.85rem;
+    border-radius: 999px;
+    border: 1px solid var(--bx-border);
+    background: transparent;
+    color: var(--bx-muted);
+    font-size: 0.8rem;
+    transition: all 0.2s;
+}
+
+.bx-dir-pill:hover,
+.bx-dir-pill.active {
+    border-color: var(--bx-accent);
+    color: var(--bx-accent);
+    background: rgba(0, 240, 255, 0.08);
+}
+
+.bx-dir-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1rem;
+}
+
+.bx-dir-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 1.15rem;
+    background: rgba(13, 17, 23, 0.95);
+    border: 1px solid var(--bx-border);
+    border-radius: var(--bx-radius);
+    transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
+}
+
+.bx-dir-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(0, 240, 255, 0.35);
+    box-shadow: var(--bx-glow);
+}
+
+.bx-dir-card-head {
+    display: flex;
+    gap: 0.85rem;
+    margin-bottom: 0.75rem;
+}
+
+.bx-dir-card-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(0, 240, 255, 0.15), rgba(124, 58, 237, 0.2));
+    border: 1px solid var(--bx-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--bx-accent);
+    flex-shrink: 0;
+}
+
+.bx-dir-card h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 0 0 0.2rem;
+    color: #fff;
+    line-height: 1.3;
+}
+
+.bx-dir-card .bx-dir-role {
+    font-size: 0.8rem;
+    color: var(--bx-muted);
+}
+
+.bx-dir-badge {
+    display: inline-block;
+    font-size: 0.65rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 6px;
+    background: rgba(34, 197, 94, 0.15);
+    color: #4ade80;
+    border: 1px solid rgba(34, 197, 94, 0.3);
+    margin-left: auto;
+    align-self: flex-start;
+}
+
+.bx-dir-card-meta {
+    font-size: 0.82rem;
+    color: var(--bx-muted);
+    margin-bottom: 0.35rem;
+    line-height: 1.5;
+}
+
+.bx-dir-card-meta i {
+    width: 1.1rem;
+    color: var(--bx-accent);
+    opacity: 0.8;
+}
+
+.bx-dir-card-actions {
+    margin-top: auto;
+    padding-top: 0.85rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+}
+
+.bx-dir-card-actions .bx-btn-full {
+    grid-column: 1 / -1;
+}
+
+.bx-dir-empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 3rem 1rem;
+}
+
+.bx-modal-dark .modal-content {
+    background: var(--bx-surface);
+    border: 1px solid var(--bx-border);
+    color: var(--bx-text);
+}
+
+.bx-modal-dark .modal-header {
+    border-color: var(--bx-border);
+}
+
+.bx-modal-dark .btn-close {
+    filter: invert(1);
+}
+
+@media (max-width: 576px) {
+    .bx-dir-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .bx-dir-filters {
+        top: 64px;
+    }
+}

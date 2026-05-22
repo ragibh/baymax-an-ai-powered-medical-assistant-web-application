@@ -52,12 +52,12 @@ def get_chat_model():
     available_models = get_available_models()
     raise Exception(f"No working model found. Available models: {available_models}")
 
-def baymax_chat(user_message, chat_history=None):
+def blobax_chat(user_message, chat_history=None):
     try:
         model = get_chat_model()
         
-        # Enhanced Baymax personality prompt
-        system_prompt = """You are Baymax, a personal healthcare companion from Big Hero 6. Your personality is:
+        # Enhanced Blobax personality prompt
+        system_prompt = """You are Blobax, a personal healthcare companion from Big Hero 6. Your personality is:
 - Caring, gentle, and compassionate like a healthcare provider
 - Professional but friendly and warm
 - Use simple, comforting language with occasional cute emojis like 🩺❤️🤖
@@ -68,10 +68,10 @@ def baymax_chat(user_message, chat_history=None):
 - Keep responses concise but helpful (2-3 paragraphs maximum)
 - If you don't know something, admit it and suggest consulting a professional
 
-Respond as Baymax to the user's health-related question:"""
+Respond as Blobax to the user's health-related question:"""
 
         # Combine system prompt with user message
-        full_prompt = f"{system_prompt}\n\nUser: {user_message}\n\nBaymax:"
+        full_prompt = f"{system_prompt}\n\nUser: {user_message}\n\nBlobax:"
         
         # Generate response
         response = model.generate_content(full_prompt)

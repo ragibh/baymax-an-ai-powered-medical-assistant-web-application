@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Diabetes Prediction — Blobax{% endblock %}
+{% block content %}
+
+<section class="bx-section bx-pred-form-section bx-page">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-7">
+
+        <div class="text-center mb-4 bx-reveal">
+          <a href="{% url 'predictions:home' %}" class="bx-back-link">
+            <i class="fas fa-arrow-left me-2"></i>Back to Predictions
+          </a>
+          <div class="bx-pred-form-icon bx-pred-form-icon--diabetes mx-auto mt-3">
+            <i class="fas fa-syringe"></i>
+          </div>
+          <h1 class="bx-title mt-3">Diabetes Prediction</h1>
+          <p class="bx-muted-text">Fill in your health details below. All 8 fields are required.</p>
+        </div>
+
+        {% if result and not result.error %}
+        <div class="bx-result-card bx-result-card--{{ result.risk_level }} bx-reveal mb-4">
+          <div class="bx-result-card__top">
+            <div class="bx-result-card__icon">
+              {% if result.prediction == 1 %}
+              <i class="fas fa-triangle-exclamation"></i>
+              {% else %}
+              <i class="fas fa-circle-check"></i>
+              {% endif %}
+            </div>
+            <div>
+              <h3 class="bx-result-card__label">{{ result.label }}</h3>
+              <p class="bx-result-card__sub">Risk Level: <span class="bx-risk-{{ result.risk_level }}">{{ result.risk_level|title }}</span></p>
+            </div>
+          </div>
+          <div class="bx-result-probability">
+            <div class="bx-prob-label">Probability Score</div>
+            <div class="bx-prob-bar-wrap">
+              <div class="bx-prob-bar" style="--prob: {{ result.probability }}%">
+                <div class="bx-prob-fill"></div>
+              </div>
+              <span class="bx-prob-pct">{{ result.probability }}%</span>
+            </div>
+          </div>
+          <p class="bx-result-disclaimer">
+            <i class="fas fa-info-circle me-1"></i>
+            This is an AI prediction — not a medical diagnosis. Consult a doctor.
+          </p>
+        </div>
+        {% endif %}
+
+        {% if result.error %}
+        <div class="alert alert-danger bx-reveal">{{ result.error }}</div>
+        {% endif %}
+
+        <div class="bx-form-card bx-reveal">
+          <form method="post" novalidate id="diabetes-form">
+            {% csrf_token %}
+            <div class="row g-3">
+
+              <div class="col-md-6">
+                <label class="bx-label">Gender</label>
+                <div class="bx-toggle-group">
+                  <input type="radio" name="gender" id="g-male" value="Male" class="bx-radio-hidden" required checked>
+                  <label for="g-male" class="bx-toggle-btn"><i class="fas fa-mars me-2"></i>Male</label>
+                  <input type="radio" name="gender" id="g-female" value="Female" class="bx-radio-hidden">
+                  <label for="g-female" class="bx-toggle-btn"><i class="fas fa-venus me-2"></i>Female</label>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <label class="bx-label" for="age">Age <span class="bx-hint">1 – 120</span></label>
+                <input type="number" class="bx-input" id="age" name="age" min="1" max="120" placeholder="e.g. 35" required>
+              </div>
+
+              <div class="col-md-6">
+                <label class="bx-label">Hypertension (High Blood Pressure)?</label>
+                <div class="bx-toggle-group">
+                  <input type="radio" name="hypertension" id="ht-no" value="0" class="bx-radio-hidden" checked>
+                  <label for="ht-no" class="bx-toggle-btn">No</label>
+                  <input type="radio" name="hypertension" id="ht-yes" value="1" class="bx-radio-hidden">
+                  <label for="ht-yes" class="bx-toggle-btn">Yes</label>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <label class="bx-label">Existing Heart Disease?</label>
+                <div class="bx-toggle-group">
+                  <input type="radio" name="heart_disease" id="hd-no" value="0" class="bx-radio-hidden" checked>
+                  <label for="hd-no" class="bx-toggle-btn">No</label>
+                  <input type="radio" name="heart_disease" id="hd-yes" value="1" class="bx-radio-hidden">
+                  <label for="hd-yes" class="bx-toggle-btn">Yes</label>
+                </div>
+              </div>
+
+              <div class="col-12">
+                <label class="bx-label">Smoking History</label>
+                <div class="bx-toggle-group bx-toggle-group--wrap">
+                  <input type="radio" name="smoking_history" id="sm-never" value="never" class="bx-radio-hidden" checked>
+                  <label for="sm-never" class="bx-toggle-btn">Never</label>
+                  <input type="radio" name="smoking_history" id="sm-former" value="former" class="bx-radio-hidden">
+                  <label for="sm-former" class="bx-toggle-btn">Former</label>
+                  <input type="radio" name="smoking_history" id="sm-notcurrent" value="not current" class="bx-radio-hidden">
+                  <label for="sm-notcurrent" class="bx-toggle-btn">Not Current</label>
+                  <input type="radio" name="smoking_history" id="sm-ever" value="ever" class="bx-radio-hidden">
+                  <label for="sm-ever" class="bx-toggle-btn">Ever</label>
+                  <input type="radio" name="smoking_history" id="sm-current" value="current" class="bx-radio-hidden">
+                  <label for="sm-current" class="bx-toggle-btn">Current</label>
+                </div>
+              </div>
+
+              <div class="col-md-4">
+                <label class="bx-label" for="bmi">BMI <span class="bx-hint">kg/m²</span></label>
+                <input type="number" step="0.1" class="bx-input" id="bmi" name="bmi" min="10" max="80" placeholder="e.g. 24.5" required>
+                <small class="bx-field-help">Normal: 18.5–24.9</small>
+              </div>
+
+              <div class="col-md-4">
+                <label class="bx-label" for="HbA1c_level">HbA1c Level <span class="bx-hint">%</span></label>
+                <input type="number" step="0.1" class="bx-input" id="HbA1c_level" name="HbA1c_level" min="3" max="15" placeholder="e.g. 5.8" required>
+                <small class="bx-field-help">Normal: &lt;5.7%</small>
+              </div>
+
+              <div class="col-md-4">
+                <label class="bx-label" for="blood_glucose_level">Blood Glucose <span class="bx-hint">mg/dL</span></label>
+                <input type="number" class="bx-input" id="blood_glucose_level" name="blood_glucose_level" min="50" max="500" placeholder="e.g. 140" required>
+                <small class="bx-field-help">Fasting normal: 70–99 mg/dL</small>
+              </div>
+
+            </div>
+
+            <div class="bx-form-actions mt-4">
+              <button type="submit" class="bx-btn bx-btn-primary bx-btn-predict">
+                <i class="fas fa-brain me-2"></i>Predict Diabetes Risk
+              </button>
+              <button type="reset" class="bx-btn bx-btn-outline">
+                <i class="fas fa-rotate-left me-2"></i>Reset
+              </button>
+            </div>
+          </form>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

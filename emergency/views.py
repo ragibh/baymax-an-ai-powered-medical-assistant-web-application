@@ -41,22 +41,21 @@ def chatbot_api(request):
             if not user_message:
                 return JsonResponse({'error': 'Empty message'}, status=400)
             
-            # Get Baymax response (with potential timeout in service)
-            baymax_response = gemini_service.chat(user_message)
+            # Get Blobax response (with potential timeout in service)
+            blobax_response = gemini_service.chat(user_message)
             
-            # Save to database (non-blocking approach)
             ChatMessage.objects.create(
                 user=request.user,
                 message=user_message,
-                response=baymax_response,
+                response=blobax_response,
                 is_user=True,
-                session_id=session_id
+                session_id=session_id,
             )
             
             response_time = round(time.time() - start_time, 2)
             
             return JsonResponse({
-                'response': baymax_response,
+                'response': blobax_response,
                 'session_id': session_id,
                 'response_time': response_time,
                 'timestamp': int(time.time())
@@ -81,13 +80,20 @@ def get_chat_history(request):
     
     chat_data = []
     for msg in messages:
-        chat_data.append({
-            'is_user': msg.is_user,
-            'message': msg.message if msg.is_user else msg.response,
-            'timestamp': msg.timestamp.isoformat()
-        })
-    
-    return JsonResponse({'messages': reversed(chat_data)})  # Reverse for display
+        if msg.message:
+            chat_data.append({
+                'is_user': True,
+                'message': msg.message,
+                'timestamp': msg.timestamp.isoformat(),
+            })
+        if msg.response:
+            chat_data.append({
+                'is_user': False,
+                'message': msg.response,
+                'timestamp': msg.timestamp.isoformat(),
+            })
+
+    return JsonResponse({'messages': chat_data})
 
 @login_required
 @csrf_exempt
@@ -177,7 +183,7 @@ def get_doctor_details(request, doctor_id):
             'district': doctor.district,
             'upazila': doctor.upazila,
             'professional': doctor.professional,
-            'contact_no': doctor.contact_no,
+            'contact_no': doctor.formatted_phone,
             'address': doctor.address,
             'degree': doctor.degree,
             'department': doctor.department,

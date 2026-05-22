@@ -1,35 +1,306 @@
 {% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Health Report — Blobax{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <div class="row">
-        <div class="col-md-8 mx-auto">
-            <div class="card">
-                <div class="card-header">
-                    <h4>Your Profile</h4>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <p><strong>Username:</strong> {{ user.username }}</p>
-                            <p><strong>Email:</strong> {{ user.email }}</p>
-                            <p><strong>Phone:</strong> {{ profile.phone|default:"Not provided" }}</p>
-                        </div>
-                        <div class="col-md-6">
-                            <p><strong>Age:</strong> {{ profile.age|default:"Not provided" }}</p>
-                            <p><strong>Member since:</strong> {{ user.date_joined|date:"M d, Y" }}</p>
-                            <p><strong>Last login:</strong> {{ user.last_login|date:"M d, Y H:i" }}</p>
-                        </div>
-                    </div>
-                    <div class="row mt-3">
-                        <div class="col-12">
-                            <p><strong>Address:</strong></p>
-                            <p>{{ profile.address|default:"Not provided"|linebreaks }}</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+<section class="bx-section bx-profile-section bx-page">
+<div class="container">
+
+  <div class="bx-profile-header bx-reveal">
+    <div class="bx-avatar-wrap">
+      {% if profile.avatar %}
+        <img src="{{ profile.avatar.url }}" class="bx-avatar" alt="Avatar">
+      {% else %}
+        <div class="bx-avatar-initials">
+          {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}{% if not user.first_name %}{{ user.username|first|upper }}{% endif %}
         </div>
+      {% endif %}
+      <span class="bx-avatar-edit" title="Change photo in Edit Profile tab"><i class="fas fa-camera"></i></span>
     </div>
+    <div class="bx-profile-meta">
+      <h1 class="bx-title h3">{{ user.get_full_name|default:user.username }}</h1>
+      <p class="bx-muted-text mb-1">@{{ user.username }} · {{ user.email }}</p>
+      <p class="small text-muted mb-0">Member since {{ user.date_joined|date:"M d, Y" }}</p>
+      {% if profile.blood_group %}
+      <span class="bx-blood-badge mt-2">🩸 {{ profile.blood_group }}</span>
+      {% endif %}
+    </div>
+    <div class="bx-profile-quick-stats">
+      <div class="bx-qstat"><span class="bx-qstat-num">{{ health.total_predictions|default:"0" }}</span><span class="bx-qstat-label">Predictions</span></div>
+      <div class="bx-qstat"><span class="bx-qstat-num">{{ vitals|length }}</span><span class="bx-qstat-label">Vitals</span></div>
+      <div class="bx-qstat"><span class="bx-qstat-num">{{ donations.count }}</span><span class="bx-qstat-label">Donations</span></div>
+    </div>
+  </div>
+
+  <div class="bx-profile-tabs bx-reveal">
+    <button type="button" class="bx-tab-btn active" data-tab="overview">Overview</button>
+    <button type="button" class="bx-tab-btn" data-tab="edit">Edit Profile</button>
+    <button type="button" class="bx-tab-btn" data-tab="vitals">Health Vitals</button>
+    <button type="button" class="bx-tab-btn" data-tab="predictions">Predictions</button>
+    <button type="button" class="bx-tab-btn" data-tab="donations">Blood Donations</button>
+  </div>
+
+  <div class="bx-tab-content active" id="tab-overview">
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="bx-card h-100">
+          <h6 class="fw-bold">Contact</h6>
+          <p class="small mb-1"><span class="text-muted">Phone</span><br><strong>{{ profile.phone|default:"—" }}</strong></p>
+          <p class="small mb-0"><span class="text-muted">Age</span><br><strong>{{ profile.age|default:"—" }}</strong></p>
+        </div>
+      </div>
+      <div class="col-md-8">
+        <div class="bx-card h-100">
+          <h6 class="fw-bold">Address</h6>
+          <p class="mb-3">{{ profile.address|default:"Not provided"|linebreaksbr }}</p>
+          <a href="{% url 'predictions:home' %}" class="bx-btn bx-btn-primary btn-sm me-2">New prediction</a>
+          <a href="{% url 'emergency:home' %}" class="bx-btn bx-btn-outline btn-sm">Assistant</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bx-tab-content" id="tab-edit">
+    <div class="bx-form-card">
+      <form method="post" action="{% url 'users:update_profile' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="bx-label">Phone</label>
+            <input type="text" name="phone" class="bx-input" value="{{ profile.phone }}">
+          </div>
+          <div class="col-md-6">
+            <label class="bx-label">Age</label>
+            <input type="number" name="age" class="bx-input" value="{{ profile.age|default:'' }}" min="1" max="120">
+          </div>
+          <div class="col-md-6">
+            <label class="bx-label">Blood group</label>
+            <select name="blood_group" class="form-select bx-input">
+              <option value="">— Select —</option>
+              <option value="A+" {% if profile.blood_group == "A+" %}selected{% endif %}>A+</option>
+              <option value="A-" {% if profile.blood_group == "A-" %}selected{% endif %}>A-</option>
+              <option value="B+" {% if profile.blood_group == "B+" %}selected{% endif %}>B+</option>
+              <option value="B-" {% if profile.blood_group == "B-" %}selected{% endif %}>B-</option>
+              <option value="O+" {% if profile.blood_group == "O+" %}selected{% endif %}>O+</option>
+              <option value="O-" {% if profile.blood_group == "O-" %}selected{% endif %}>O-</option>
+              <option value="AB+" {% if profile.blood_group == "AB+" %}selected{% endif %}>AB+</option>
+              <option value="AB-" {% if profile.blood_group == "AB-" %}selected{% endif %}>AB-</option>
+            </select>
+          </div>
+          <div class="col-12">
+            <label class="bx-label">Address</label>
+            <textarea name="address" class="bx-input" rows="3">{{ profile.address }}</textarea>
+          </div>
+          <div class="col-12">
+            <label class="bx-label">Profile photo</label>
+            <input type="file" name="avatar" class="bx-input" accept="image/*">
+          </div>
+        </div>
+        <button type="submit" class="bx-btn bx-btn-primary mt-4">Save Changes</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="bx-tab-content" id="tab-vitals">
+    <div class="bx-form-card mb-4">
+      <h6 class="fw-bold mb-3">Add vital reading</h6>
+      <form id="vital-form" class="row g-3 align-items-end">
+        <div class="col-md-3">
+          <label class="bx-label">Type</label>
+          <select id="vital-type" class="form-select bx-input">
+            {% for key, label in vital_types %}
+            <option value="{{ key }}">{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-2">
+          <label class="bx-label">Value</label>
+          <input type="number" step="0.1" id="vital-value" class="bx-input" required>
+        </div>
+        <div class="col-md-3">
+          <label class="bx-label">Date &amp; time</label>
+          <input type="datetime-local" id="vital-date" class="bx-input">
+        </div>
+        <div class="col-md-2">
+          <label class="bx-label">Note</label>
+          <input type="text" id="vital-note" class="bx-input" placeholder="Optional">
+        </div>
+        <div class="col-md-2">
+          <button type="submit" class="bx-btn bx-btn-primary w-100">Add</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="row g-3 mb-4">
+      {% for key, label in vital_chart_keys %}
+      <div class="col-md-6">
+        <div class="bx-vital-chart-card bx-card">
+          <h6 class="fw-bold small">{{ label }}</h6>
+          <canvas id="chart-{{ key }}" height="120"></canvas>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="bx-table-wrap">
+      <table class="table bx-table mb-0">
+        <thead><tr><th>Date</th><th>Type</th><th>Value</th><th>Note</th><th></th></tr></thead>
+        <tbody>
+          {% for v in vitals %}
+          <tr>
+            <td>{{ v.recorded_at|date:"M d, Y H:i" }}</td>
+            <td>{{ v.get_vital_type_display }}</td>
+            <td><strong>{{ v.value }}</strong></td>
+            <td class="small">{{ v.note|default:"—" }}</td>
+            <td>
+              <form method="post" action="{% url 'users:delete_vital' v.id %}" class="d-inline">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+              </form>
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="5" class="text-muted text-center py-4">No vitals logged yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="bx-tab-content" id="tab-predictions">
+    {% include 'partials/health_report.html' %}
+    {% if ml_predictions %}
+    <div class="bx-table-wrap mt-4">
+      <div class="p-3 border-bottom"><h6 class="fw-bold mb-0">ML prediction records</h6></div>
+      <table class="table bx-table mb-0">
+        <thead><tr><th>Date</th><th>Type</th><th>Result</th><th>Risk %</th></tr></thead>
+        <tbody>
+          {% for p in ml_predictions %}
+          <tr class="{% if 'Detected' in p.result and 'No' not in p.result %}bx-row-risk{% else %}bx-row-ok{% endif %}">
+            <td>{{ p.created_at|date:"M d, Y" }}</td>
+            <td>{{ p.get_prediction_type_display }}</td>
+            <td>{{ p.result }}</td>
+            <td>{{ p.probability|default:"—" }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="bx-tab-content" id="tab-donations">
+    <div class="row g-4">
+      <div class="col-lg-5">
+        <div class="bx-form-card">
+          <h6 class="fw-bold mb-3">Log donation</h6>
+          <form method="post" action="{% url 'users:add_donation' %}">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label class="bx-label">Date</label>
+              <input type="date" name="donated_at" class="bx-input" required>
+            </div>
+            <div class="mb-3">
+              <label class="bx-label">Location</label>
+              <input type="text" name="location" class="bx-input" placeholder="Hospital / camp">
+            </div>
+            <div class="mb-3">
+              <label class="bx-label">Units</label>
+              <input type="number" step="0.5" name="units" class="bx-input" value="1" min="0.5">
+            </div>
+            <div class="mb-3">
+              <label class="bx-label">Note</label>
+              <input type="text" name="recipient_note" class="bx-input">
+            </div>
+            <button type="submit" class="bx-btn bx-btn-primary w-100">Add record</button>
+          </form>
+        </div>
+      </div>
+      <div class="col-lg-7">
+        <div class="bx-table-wrap">
+          <table class="table bx-table mb-0">
+            <thead><tr><th>Date</th><th>Location</th><th>Units</th><th>Note</th></tr></thead>
+            <tbody>
+              {% for d in donations %}
+              <tr>
+                <td>{{ d.donated_at|date:"M d, Y" }}</td>
+                <td>{{ d.location|default:"—" }}</td>
+                <td>{{ d.units }}</td>
+                <td>{{ d.recipient_note|default:"—" }}</td>
+              </tr>
+              {% empty %}
+              <tr><td colspan="4" class="text-center text-muted py-4">No donations logged.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script>
+document.querySelectorAll('.bx-tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.bx-tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.bx-tab-content').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+  });
+});
+
+const chartData = {{ chart_data|safe }};
+const chartColors = { bp_systolic: '#00f0ff', bp_diastolic: '#7c3aed', glucose: '#f59e0b', weight: '#10b981', heart_rate: '#f87171' };
+Object.keys(chartData).forEach(key => {
+  const d = chartData[key];
+  if (!d.labels.length) return;
+  const canvas = document.getElementById('chart-' + key);
+  if (!canvas) return;
+  new Chart(canvas, {
+    type: 'line',
+    data: {
+      labels: d.labels,
+      datasets: [{
+        data: d.values,
+        borderColor: chartColors[key] || '#00f0ff',
+        backgroundColor: (chartColors[key] || '#00f0ff') + '22',
+        fill: true,
+        tension: 0.4,
+        pointRadius: 3,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { ticks: { color: '#94a3b8', maxRotation: 0 }, grid: { color: 'rgba(255,255,255,0.05)' } },
+        y: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+      }
+    }
+  });
+});
+
+document.getElementById('vital-form')?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const dt = document.getElementById('vital-date').value;
+  const body = {
+    vital_type: document.getElementById('vital-type').value,
+    value: document.getElementById('vital-value').value,
+    note: document.getElementById('vital-note').value,
+    recorded_at: dt ? new Date(dt).toISOString() : new Date().toISOString(),
+  };
+  const res = await fetch('{% url "users:add_vital" %}', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
+    body: JSON.stringify(body),
+  });
+  if (res.ok) location.reload();
+  else alert('Could not save vital');
+});
+</script>
 {% endblock %}

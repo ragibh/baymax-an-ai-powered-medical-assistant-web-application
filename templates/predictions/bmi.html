@@ -1,52 +1,55 @@
 {% extends 'base.html' %}
 
+{% block title %}BMI Calculator — Blobax{% endblock %}
+
 {% block content %}
-<div class="container mt-4">
-    <div class="row">
-        <div class="col-md-8 mx-auto">
-            <div class="card">
-                <div class="card-header">
-                    <h4>BMI Calculator</h4>
-                </div>
-                <div class="card-body">
+<div class="bx-page">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 bx-reveal">
+                <p class="bx-eyebrow"><a href="{% url 'predictions:home' %}" class="text-decoration-none">← Predictions</a></p>
+                <h1 class="bx-title h2">BMI calculator</h1>
+                <p class="text-muted mb-4">Results are saved to your private health report.</p>
+                <div class="bx-card">
                     <form method="post">
                         {% csrf_token %}
-                        
-                        <div class="row">
+                        <div class="row g-3">
                             <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label class="form-label">Height (cm)</label>
-                                    {{ form.height }}
-                                </div>
+                                <label class="form-label fw-semibold">{{ form.height.label }}</label>
+                                {{ form.height }}
                             </div>
                             <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label class="form-label">Weight (kg)</label>
-                                    {{ form.weight }}
-                                </div>
+                                <label class="form-label fw-semibold">{{ form.weight.label }}</label>
+                                {{ form.weight }}
                             </div>
                         </div>
-                        
-                        <button type="submit" class="btn btn-primary w-100">Calculate BMI</button>
+                        <button type="submit" class="bx-btn bx-btn-primary w-100 mt-4">Calculate BMI</button>
                     </form>
-                    
                     {% if result %}
-                    <div class="mt-4 p-3 bg-light rounded">
-                        <h5>Your Results:</h5>
-                        <p><strong>BMI:</strong> {{ result.bmi }}</p>
-                        <p><strong>Category:</strong> {{ result.category }}</p>
-                        
-                        <div class="progress mt-3" style="height: 25px;">
+                    <div class="mt-4 p-4 rounded-3" style="background: #f0f7ff;">
+                        <h5 class="fw-bold mb-3">Your result</h5>
+                        <div class="row text-center g-3">
+                            <div class="col-6">
+                                <div class="bx-stat-num h3">{{ result.bmi }}</div>
+                                <small class="text-muted">BMI score</small>
+                            </div>
+                            <div class="col-6">
+                                <div class="h4 fw-bold text-primary">{{ result.category }}</div>
+                                <small class="text-muted">Category</small>
+                            </div>
+                        </div>
+                        <div class="progress mt-3 rounded-pill" style="height: 10px;">
                             {% if result.bmi < 18.5 %}
-                                <div class="progress-bar bg-info" style="width: 25%">Underweight</div>
+                            <div class="progress-bar bg-info" style="width: 25%"></div>
                             {% elif result.bmi < 25 %}
-                                <div class="progress-bar bg-success" style="width: 50%">Normal</div>
+                            <div class="progress-bar bg-success" style="width: 50%"></div>
                             {% elif result.bmi < 30 %}
-                                <div class="progress-bar bg-warning" style="width: 75%">Overweight</div>
+                            <div class="progress-bar bg-warning" style="width: 75%"></div>
                             {% else %}
-                                <div class="progress-bar bg-danger" style="width: 100%">Obese</div>
+                            <div class="progress-bar bg-danger" style="width: 100%"></div>
                             {% endif %}
                         </div>
+                        <a href="{% url 'users:profile' %}" class="bx-btn bx-btn-outline btn-sm mt-3">View in health report</a>
                     </div>
                     {% endif %}
                 </div>
@@ -54,13 +57,4 @@
         </div>
     </div>
 </div>
-
-<style>
-    input {
-        width: 100%;
-        padding: 8px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-    }
-</style>
 {% endblock %}

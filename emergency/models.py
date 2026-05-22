@@ -24,7 +24,7 @@ class ChatMessage(models.Model):
         ordering = ['timestamp']
     
     def __str__(self):
-        return f"{'User' if self.is_user else 'Baymax'}: {self.message[:50]}"
+        return f"{'User' if self.is_user else 'Blobax'}: {self.message[:50]}"
 
 # NEW: Doctor Directory Model
 class Doctor(models.Model):
@@ -58,3 +58,18 @@ class Doctor(models.Model):
         if self.latitude and self.longitude:
             return f"https://www.google.com/maps/dir/?api=1&destination={self.latitude},{self.longitude}"
         return f"https://www.google.com/maps/dir/?api=1&destination={self.address}"
+
+    @property
+    def formatted_phone(self):
+        """Display phone numbers with +880 prefix (Bangladesh)."""
+        phone = str(self.contact_no).strip()
+        if not phone or phone in ('-', 'N/A', ''):
+            return 'N/A'
+        phone = phone.replace(' ', '').replace('-', '')
+        if phone.startswith('01') and len(phone) == 11:
+            return '+880' + phone[1:]
+        if phone.startswith('+880'):
+            return phone
+        if phone.startswith('880') and len(phone) == 13:
+            return '+' + phone
+        return '+880' + phone.lstrip('0')
