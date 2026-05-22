@@ -2,6 +2,19 @@
 {% load static %}
 
 {% block body_class %}bx-page-home{% endblock %}
+{% block preloader %}
+<div id="bx-preloader" class="bx-preloader">
+    <div class="bx-preloader-panel" style="left:0;width:50%"></div>
+    <div class="bx-preloader-panel" style="right:0;width:50%"></div>
+    <div class="bx-preloader-inner">
+        <div class="bx-preloader-logo">Blobax</div>
+        <div class="bx-preloader-bar-wrap">
+            <div class="bx-preloader-bar"><div class="bx-preloader-fill"></div></div>
+            <span class="bx-preloader-pct">0%</span>
+        </div>
+    </div>
+</div>
+{% endblock %}
 {% block extra_css %}
 <link href="{% static 'css/hero-video.css' %}" rel="stylesheet">
 {% endblock %}
@@ -21,30 +34,17 @@
 
     <div class="container bx-hero-video-inner">
         <div class="row align-items-center g-4 w-100">
-            <div class="col-lg-7">
-                <p class="bx-hero-vid-eyebrow bx-reveal">AI-Powered Health Intelligence</p>
-                <h1 class="bx-hero-vid-title bx-reveal">
-                    Your Personal AI Health Companion — Built for <em>Bangladesh</em>
-                </h1>
+            <div class="col-lg-8">
+                <p class="bx-hero-vid-eyebrow bx-reveal">AI Health Intelligence</p>
+                <h1 class="bx-hero-vid-title bx-reveal">Know Your Health Before It Speaks</h1>
                 <p class="bx-hero-vid-desc bx-reveal">
-                    Blobax combines machine learning disease prediction, emergency AI guidance, and private health tracking — so you can understand your health with tools made for Bangladesh.
+                    Blobax uses machine learning to detect diabetes, heart disease, and liver
+                    conditions early so you can act before symptoms do.
                 </p>
                 <div class="bx-hero-vid-actions d-flex flex-wrap bx-reveal">
-                    {% if user.is_authenticated %}
-                    <a href="{% url 'dashboard:home' %}" class="bx-btn bx-btn-primary">Dashboard</a>
-                    <a href="{% url 'emergency:home' %}" class="bx-btn bx-btn-outline">Assistant</a>
-                    {% else %}
-                    <a href="{% url 'users:register' %}" class="bx-btn bx-btn-primary">Get Started</a>
-                    <a href="{% url 'users:login' %}" class="bx-btn bx-btn-outline">Sign In</a>
-                    {% endif %}
+                    <a href="{% url 'predictions:home' %}" class="bx-btn bx-btn-primary">Start Health Check</a>
+                    <a href="#features" class="bx-btn bx-btn-outline">Explore Features</a>
                 </div>
-                <div class="bx-hero-vid-progress bx-reveal mt-4">
-                    <div class="bar"><div class="bar-fill"></div></div>
-                    <span class="slide-num">01</span>
-                </div>
-            </div>
-            <div class="col-lg-5 text-center d-none d-lg-block bx-reveal">
-                <img src="{% static 'images/blobax2.png' %}" class="bx-float-anim img-fluid" style="max-width:min(380px,100%)" alt="Blobax AI" onerror="this.style.display='none'">
             </div>
         </div>
     </div>
@@ -54,15 +54,16 @@
     <div class="bx-glow-orb" style="left:-80px;top:20%"></div>
     <div class="container position-relative">
         <div class="row align-items-center g-4">
-            <div class="col-lg-5 bx-reveal">
-                <img src="{% static 'images/blobax3.png' %}" class="img-fluid rounded-4 bx-float-slow" alt="Blobax" style="box-shadow:var(--bx-glow)" onerror="this.style.display='none'">
+            <div class="col-lg-5 bx-reveal position-relative text-center">
+                <div class="bx-orb-bg" style="width:300px;height:300px;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:radial-gradient(circle,rgba(0,212,170,0.18) 0%,transparent 70%);pointer-events:none;border-radius:50%;"></div>
+                <img src="{% static 'images/blobax1.png' %}" class="bx-float-anim bx-glow-pulse-anim img-fluid rounded-4 position-relative" alt="Blobax" style="max-width:420px" onerror="this.style.display='none'">
             </div>
             <div class="col-lg-7 bx-reveal">
                 <div class="bx-about-card">
-                    <p class="bx-section-num">01 — About Blobax</p>
+                    <p class="bx-eyebrow">About Blobax</p>
                     <h2 class="bx-land-title">Healthcare AI with heart</h2>
-                    <p class="bx-lead">Blobax is an AI-powered health web app built by <strong>Md. Ragib Hasan</strong>, a Computer Science and Engineering student at Sylhet Engineering College.</p>
-                    <p class="bx-lead">Inspired by Big Hero 6, Blobax brings compassionate AI to everyday healthcare — making ML-based disease prediction, emergency assistance, and health tracking accessible to everyone in Bangladesh.</p>
+                    <p class="bx-lead">Blobax is built by <strong>Md. Ragib Hasan</strong>, a Computer Science and Engineering student at Sylhet Engineering College, passionate about real-world AI systems that actually help people.</p>
+                    <p class="bx-lead">Inspired by Big Hero 6, Blobax brings compassionate AI to everyday healthcare with ML-based disease prediction, emergency assistance, and health tracking in one place.</p>
                     <a href="{% url 'users:register' %}" class="bx-btn bx-btn-primary">Create free account</a>
                 </div>
             </div>
@@ -73,7 +74,7 @@
 <section id="features" class="bx-land-section bx-section-alt">
     <div class="container">
         <div class="text-center mb-4 bx-reveal">
-            <p class="bx-section-num">02 — What Blobax can do</p>
+            <p class="bx-eyebrow">What Blobax can do</p>
             <h2 class="bx-land-title">Precision health tools</h2>
             <p class="bx-lead mx-auto">Live ML models, emergency chat, doctor directory, and personal health tracking.</p>
         </div>
@@ -82,7 +83,7 @@
                 <div class="bx-card h-100">
                     <div class="bx-card-icon"><i class="fas fa-syringe"></i></div>
                     <h5 class="fw-bold">ML Predictions</h5>
-                    <p class="small text-muted">Diabetes, heart &amp; liver risk — Random Forest &amp; XGBoost models.</p>
+                    <p class="small text-muted">Diabetes, heart &amp; liver risk. Random Forest &amp; XGBoost models.</p>
                     <span class="bx-badge-live">Live</span>
                 </div>
             </div>
@@ -114,7 +115,7 @@
                 <div class="bx-card h-100">
                     <div class="bx-card-icon"><i class="fas fa-heart-pulse"></i></div>
                     <h5 class="fw-bold">Health Tracking</h5>
-                    <p class="small text-muted">Log BP, glucose, weight &amp; more — view trends on your profile.</p>
+                    <p class="small text-muted">Log BP, glucose, weight &amp; more. View trends on your profile.</p>
                     <span class="bx-badge-live">Live</span>
                 </div>
             </div>
@@ -122,7 +123,7 @@
                 <div class="bx-card h-100">
                     <div class="bx-card-icon"><i class="fas fa-file-prescription"></i></div>
                     <h5 class="fw-bold">Prescription OCR</h5>
-                    <p class="small text-muted mb-0">Handwritten Rx reading — coming soon.</p>
+                    <p class="small text-muted mb-0">Handwritten Rx reading. Coming soon.</p>
                     <span class="bx-badge-ml">Soon</span>
                 </div>
             </div>
@@ -133,7 +134,7 @@
 <section id="how" class="bx-land-section">
     <div class="container">
         <div class="text-center mb-5 bx-reveal">
-            <p class="bx-section-num">03 — How it works</p>
+            <p class="bx-eyebrow">How it works</p>
             <h2 class="bx-land-title">Three simple steps</h2>
         </div>
         <div class="row g-4 bx-how-steps">
@@ -168,7 +169,7 @@
 <section id="stats" class="bx-stats-strip py-5">
     <div class="container">
         <div class="text-center mb-4 bx-reveal">
-            <p class="bx-section-num">04 — By the numbers</p>
+            <p class="bx-eyebrow">By the numbers</p>
             <h2 class="bx-land-title">Trusted at scale</h2>
         </div>
         <div class="row g-4">
@@ -192,7 +193,7 @@
     <div class="container">
         <div class="bx-builder-card bx-reveal">
             <div class="bx-builder-avatar">
-                <img src="{% static 'images/blobax5.png' %}" alt="Ragib Hasan" class="bx-float-slow" onerror="this.classList.add('d-none');this.nextElementSibling.classList.add('d-flex')">
+                <img src="{% static 'images/ragib.png' %}" alt="Ragib Hasan" class="bx-float-slow bx-builder-photo" onerror="this.classList.add('d-none');this.nextElementSibling.classList.add('d-flex')">
                 <div class="bx-builder-initials">RH</div>
             </div>
             <div class="bx-builder-info">
@@ -219,12 +220,12 @@
             <div class="col-lg-6 text-center bx-reveal">
                 <p class="bx-eyebrow">Get In Touch</p>
                 <h2 class="bx-land-title">Say Hello</h2>
-                <p class="bx-muted-text mb-4">Questions, feedback, or collaboration — message goes to ragibhasan53@gmail.com.</p>
+                <p class="bx-muted-text mb-4">Questions, feedback, or collaboration. Message goes to ragibhasan53@gmail.com.</p>
             </div>
         </div>
         <div class="row justify-content-center">
-            <div class="col-lg-6 bx-reveal">
-                <div class="bx-form-card">
+            <div class="col-lg-8 col-xl-7 bx-reveal">
+                <div class="bx-form-card bx-contact-form-card w-100">
                     {% if contact_sent %}
                     <div class="bx-contact-success text-center py-4">
                         <i class="fas fa-circle-check fa-2x mb-3" style="color:var(--bx-accent)"></i>

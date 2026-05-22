@@ -36,7 +36,8 @@
         }
     };
 
-    if (preloader && preloaderPct) {
+    const isLanding = document.body.classList.contains('bx-page-home');
+    if (preloader && preloaderPct && isLanding) {
         let pct = 0;
         const tick = setInterval(() => {
             pct = Math.min(pct + Math.floor(Math.random() * 12) + 3, 100);
@@ -54,9 +55,11 @@
             setTimeout(hidePreloader, 500);
         });
         setTimeout(hidePreloader, 5000);
-    } else if (preloader) {
+    } else if (preloader && isLanding) {
         window.addEventListener('load', () => setTimeout(hidePreloader, 600));
         setTimeout(hidePreloader, 4000);
+    } else if (preloader) {
+        preloader.classList.add('bx-hidden');
     }
 
     /* ——— Custom cursor ——— */
@@ -97,20 +100,22 @@
         const addHover = () => cursor.classList.add('is-hovering');
         const removeHover = () => cursor.classList.remove('is-hovering');
 
-        const bindCursorTargets = () => {
-            document
-                .querySelectorAll(
-                    'a, button, [role="button"], .bx-card, .bx-dark-card, input, textarea, select, .bx-btn, .bx-pred-card, .bx-toggle-btn, label, .bx-tab-btn'
-                )
-                .forEach((el) => {
-                    el.removeEventListener('mouseenter', addHover);
-                    el.removeEventListener('mouseleave', removeHover);
-                    el.addEventListener('mouseenter', addHover);
-                    el.addEventListener('mouseleave', removeHover);
-                });
-        };
-        bindCursorTargets();
-        window.addEventListener('load', bindCursorTargets);
+        const hoverSelector =
+            'a, button, [role="button"], input, textarea, select, .bx-btn, .bx-pred-card, .bx-toggle-btn, label, .bx-tab-btn, .bx-topic-chip';
+        document.addEventListener(
+            'mouseover',
+            (e) => {
+                if (e.target.closest(hoverSelector)) addHover();
+            },
+            { passive: true }
+        );
+        document.addEventListener(
+            'mouseout',
+            (e) => {
+                if (!e.relatedTarget || !e.relatedTarget.closest(hoverSelector)) removeHover();
+            },
+            { passive: true }
+        );
 
         window.addEventListener('mousedown', () => cursor.classList.add('is-clicking'));
         window.addEventListener('mouseup', () => cursor.classList.remove('is-clicking'));
@@ -126,7 +131,9 @@
 
     /* ——— Lenis smooth scroll (skip on chat — native scroll in thread) ——— */
     let lenis;
-    const skipLenis = document.body.classList.contains('bx-page-chat');
+    const skipLenis =
+        document.body.classList.contains('bx-page-chat') ||
+        document.body.classList.contains('bx-page-directory');
     if (hasLenis && !skipLenis) {
         lenis = new Lenis({
             duration: 1.2,
@@ -214,7 +221,7 @@
             }
         });
 
-        document.querySelectorAll('[data-counter]').forEach((el) => {
+        document.querySelectorAll('.bx-page-home [data-counter]').forEach((el) => {
             const target = parseInt(el.dataset.counter, 10) || 0;
             const suffix = el.dataset.suffix || '';
             ScrollTrigger.create({
@@ -238,7 +245,7 @@
         });
     } else {
         document.querySelectorAll('.bx-reveal').forEach((el) => el.classList.add('bx-visible'));
-        document.querySelectorAll('[data-counter]').forEach((el) => {
+        document.querySelectorAll('.bx-page-home [data-counter]').forEach((el) => {
             const target = parseInt(el.dataset.counter, 10) || 0;
             const obs = new IntersectionObserver(
                 (entries) => {

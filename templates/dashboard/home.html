@@ -1,48 +1,136 @@
 {% extends 'base.html' %}
-
+{% load static %}
 {% block title %}Dashboard — Blobax{% endblock %}
-
 {% block content %}
-<div class="bx-page">
-    <div class="container">
-        <div class="bx-dash-header bx-reveal">
-            <p class="bx-eyebrow">Dashboard</p>
-            <h1 class="bx-title h2">Your health hub</h1>
-            <p class="text-muted">Quick access to tools and your latest stats.</p>
-        </div>
+<section class="bx-section bx-dash-section">
+<div class="container">
 
-        <div class="row g-4 mb-5 bx-reveal">
-            <div class="col-md-4">
-                <div class="bx-card bx-pred-card">
-                    <div class="bx-card-icon blue mx-auto"><i class="fas fa-calculator"></i></div>
-                    <h5 class="fw-bold">Predictions</h5>
-                    <p class="text-muted small">BMI live · ML models coming soon</p>
-                    <a href="{% url 'predictions:home' %}" class="bx-btn bx-btn-primary btn-sm mt-2">Open</a>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="bx-card bx-pred-card">
-                    <div class="bx-card-icon red mx-auto"><i class="fas fa-comment-medical"></i></div>
-                    <h5 class="fw-bold">Health assistant</h5>
-                    <p class="text-muted small">Simple AI chat for guidance</p>
-                    <a href="{% url 'emergency:home' %}" class="bx-btn bx-btn-accent btn-sm mt-2">Chat</a>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="bx-card bx-pred-card">
-                    <div class="bx-card-icon teal mx-auto"><i class="fas fa-user-doctor"></i></div>
-                    <h5 class="fw-bold">Doctor directory</h5>
-                    <p class="text-muted small">Find providers in Bangladesh</p>
-                    <a href="{% url 'emergency:directory' %}" class="bx-btn bx-btn-outline btn-sm mt-2">Browse</a>
-                </div>
-            </div>
-        </div>
-
-        <div class="mb-3 bx-reveal">
-            <h4 class="fw-bold">Your activity</h4>
-            <p class="text-muted small">Summary from your account only</p>
-        </div>
-        {% include 'partials/health_report.html' %}
+  <div class="bx-dash-welcome bx-reveal">
+    <div>
+      <p class="bx-eyebrow">Health Dashboard</p>
+      <h1 class="bx-title h2">Welcome back, {{ user.first_name|default:user.username }}</h1>
+      <p class="bx-muted-text">Here's your health activity overview.</p>
     </div>
+    <a href="{% url 'predictions:home' %}" class="bx-btn bx-btn-primary">
+      <i class="fas fa-plus me-2"></i>New Prediction
+    </a>
+  </div>
+
+  <div class="row g-3 mb-4 bx-reveal">
+    <div class="col-6 col-md-3">
+      <div class="bx-stat-card">
+        <div class="bx-stat-icon" style="color:#00d4aa"><i class="fas fa-brain"></i></div>
+        <div class="bx-stat-num bx-count" data-target="{{ total_preds }}">0</div>
+        <div class="bx-stat-label">Total Checks</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="bx-stat-card">
+        <div class="bx-stat-icon" style="color:#6366f1"><i class="fas fa-syringe"></i></div>
+        <div class="bx-stat-num bx-count" data-target="{{ pred_counts_py.diabetes|default:0 }}">0</div>
+        <div class="bx-stat-label">Diabetes Checks</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="bx-stat-card">
+        <div class="bx-stat-icon" style="color:#f43f5e"><i class="fas fa-heart-pulse"></i></div>
+        <div class="bx-stat-num bx-count" data-target="{{ pred_counts_py.heart|default:0 }}">0</div>
+        <div class="bx-stat-label">Heart Checks</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="bx-stat-card">
+        <div class="bx-stat-icon" style="color:#f59e0b"><i class="fas fa-flask"></i></div>
+        <div class="bx-stat-num bx-count" data-target="{{ pred_counts_py.liver|default:0 }}">0</div>
+        <div class="bx-stat-label">Liver Checks</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4 mb-4 bx-reveal">
+    <div class="col-lg-8">
+      <div class="bx-card">
+        <h6 class="fw-bold mb-3">Activity (Last 7 Days)</h6>
+        <canvas id="dailyChart" height="120"></canvas>
+      </div>
+    </div>
+    <div class="col-lg-4">
+      <div class="bx-card">
+        <h6 class="fw-bold mb-3">Checks by Type</h6>
+        <canvas id="typeChart" height="120"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="bx-card bx-reveal">
+    <h6 class="fw-bold mb-3">Recent Checks</h6>
+    {% if recent_preds %}
+    <div class="table-responsive">
+      <table class="table bx-table mb-0">
+        <thead><tr><th>Type</th><th>Result</th><th>Probability</th><th>Date</th></tr></thead>
+        <tbody>
+        {% for p in recent_preds %}
+        <tr>
+          <td><span class="bx-type-badge bx-type-{{ p.prediction_type }}">{{ p.prediction_type|title }}</span></td>
+          <td class="{% if 'Detected' in p.result or 'detected' in p.result|lower %}text-danger{% else %}text-success{% endif %}">{{ p.result }}</td>
+          <td>
+            <div class="bx-mini-bar-wrap">
+              <div class="bx-mini-bar" style="--w:{{ p.probability|default:0 }}%"></div>
+              <span>{% if p.probability %}{{ p.probability|floatformat:0 }}%{% else %}—{% endif %}</span>
+            </div>
+          </td>
+          <td class="text-muted small">{{ p.created_at|date:"M d, Y" }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="text-center py-5 bx-muted-text">
+      <i class="fas fa-chart-line fa-2x mb-3 opacity-50"></i>
+      <p>No health checks yet. <a href="{% url 'predictions:home' %}">Run your first check</a></p>
+    </div>
+    {% endif %}
+  </div>
+
 </div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script>
+const daily   = {{ daily_chart|safe }};
+const counts  = {{ pred_counts|safe }};
+const accent  = getComputedStyle(document.documentElement).getPropertyValue('--bx-accent').trim() || '#00d4aa';
+
+new Chart(document.getElementById('dailyChart'), {
+  type: 'bar',
+  data: {
+    labels: daily.map(d => d.date),
+    datasets: [{ data: daily.map(d => d.count), backgroundColor: 'rgba(0,212,170,0.6)', borderColor: '#00d4aa', borderWidth: 1, borderRadius: 6 }]
+  },
+  options: { responsive:true, plugins:{legend:{display:false}}, scales:{
+    x:{ticks:{color:'#94a3b8'}, grid:{color:'rgba(255,255,255,0.04)'}},
+    y:{ticks:{color:'#94a3b8', stepSize:1}, grid:{color:'rgba(255,255,255,0.04)'}, beginAtZero:true}
+  }}
+});
+
+if (Object.keys(counts).length) {
+  new Chart(document.getElementById('typeChart'), {
+    type: 'doughnut',
+    data: {
+      labels: Object.keys(counts).map(k => k.charAt(0).toUpperCase() + k.slice(1)),
+      datasets: [{ data: Object.values(counts), backgroundColor: ['#00d4aa','#6366f1','#f43f5e','#f59e0b'], borderWidth: 0 }]
+    },
+    options: { responsive:true, plugins:{ legend:{ position:'bottom', labels:{ color:'#94a3b8', padding:12 } } }, cutout:'70%' }
+  });
+}
+
+document.querySelectorAll('.bx-count').forEach(el => {
+  const target = parseInt(el.dataset.target) || 0;
+  if (!target) { el.textContent = '0'; return; }
+  let start = 0;
+  const step = Math.ceil(target / 40) || 1;
+  const t = setInterval(() => { start = Math.min(start + step, target); el.textContent = start; if (start >= target) clearInterval(t); }, 40);
+});
+</script>
 {% endblock %}

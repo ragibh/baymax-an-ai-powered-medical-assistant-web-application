@@ -50,7 +50,7 @@
                 {% for p in health.recent_predictions %}
                 <tr>
                     <td>{{ p.created_at|date:"M d, Y H:i" }}</td>
-                    <td><span class="badge bg-light text-dark">{{ p.get_prediction_type_display }}</span></td>
+                    <td><span class="bx-type-badge bx-type-{{ p.prediction_type }}">{{ p.get_prediction_type_display }}</span></td>
                     <td class="small">
                         {% if p.prediction_type == 'bmi' %}
                             BMI {{ p.result.bmi }} — {{ p.result.category }}

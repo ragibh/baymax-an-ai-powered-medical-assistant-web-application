@@ -1,177 +1,144 @@
 {% extends 'base.html' %}
 {% load static %}
-
-{% block title %}Health Assistant — Blobax{% endblock %}
 {% block body_class %}bx-page-chat{% endblock %}
 {% block extra_css %}
 <link href="{% static 'css/pages-chat.css' %}" rel="stylesheet">
 {% endblock %}
-
 {% block content %}
-<div class="bx-chat-app">
-    <header class="bx-chat-topbar bx-reveal">
-        <img src="{% static 'images/blobax1.png' %}" alt="Blobax" onerror="this.style.display='none'">
-        <div>
-            <h1>Blobax Assistant</h1>
-            <p class="bx-status mb-0">
-                <span class="bx-status-dot {% if 'Online' not in gemini_status %}offline{% endif %}"></span>
-                {{ gemini_status }} · {{ response_time }}
-            </p>
-        </div>
-        <div class="bx-chat-topbar-actions">
-            <a href="{% url 'emergency:directory' %}" class="bx-btn bx-btn-outline btn-sm">Doctors</a>
-            <a href="{% url 'dashboard:home' %}" class="bx-btn bx-btn-outline btn-sm">Dashboard</a>
-            <button type="button" id="clear-chat-btn" class="bx-btn bx-btn-outline btn-sm">Clear chat</button>
-        </div>
-    </header>
+<div class="bx-chat-shell">
 
-    <div class="bx-chat-shell bx-reveal">
-        <aside class="bx-chat-toolbar">
-            <div class="bx-chat-chip-wrap">
-                <h6>Quick topics</h6>
-                <button type="button" class="bx-chat-chip emergency-topic" data-topic="heart pain emergency">Heart / chest pain</button>
-                <button type="button" class="bx-chat-chip emergency-topic" data-topic="choking help">Choking</button>
-                <button type="button" class="bx-chat-chip emergency-topic" data-topic="severe bleeding">Bleeding</button>
-                <button type="button" class="bx-chat-chip emergency-topic" data-topic="high fever">High fever</button>
-                <button type="button" class="bx-chat-chip emergency-topic" data-topic="I feel anxious">Anxiety</button>
-            </div>
-        </aside>
-
-        <main class="bx-chat-panel">
-            <div id="chat-messages" class="bx-chat-thread">
-                <div class="bx-chat-msg bot">
-                    <img src="{% static 'images/blobax1.png' %}" class="bx-chat-av" alt="" onerror="this.style.visibility='hidden'">
-                    <div>
-                        <div class="bx-chat-bubble">
-                            Hello! I'm Blobax. Ask a health question or pick a quick topic. For emergencies, call <strong>999</strong> or <strong>199</strong>.
-                        </div>
-                    </div>
-                </div>
-                {% for message in recent_messages %}
-                {% if message.message %}
-                <div class="bx-chat-msg user">
-                    <div class="bx-chat-av">{{ request.user.username|first|upper }}</div>
-                    <div><div class="bx-chat-bubble">{{ message.message|linebreaksbr }}</div></div>
-                </div>
-                {% endif %}
-                {% if message.response %}
-                <div class="bx-chat-msg bot">
-                    <img src="{% static 'images/blobax1.png' %}" class="bx-chat-av" alt="" onerror="this.style.visibility='hidden'">
-                    <div><div class="bx-chat-bubble">{{ message.response|linebreaksbr }}</div></div>
-                </div>
-                {% endif %}
-                {% endfor %}
-            </div>
-
-            <div class="bx-chat-composer">
-                <input type="text" id="chat-input" placeholder="Ask Blobax about symptoms, first aid, or wellness…" maxlength="500" autocomplete="off">
-                <button type="button" id="send-btn" class="bx-btn bx-btn-primary bx-chat-send">
-                    <i class="fas fa-paper-plane me-1"></i> Send
-                </button>
-            </div>
-        </main>
-
-        <aside class="bx-chat-aside">
-            <div class="bx-chat-hotline">
-                <h6 class="small text-uppercase mb-2" style="letter-spacing:0.1em;color:var(--bx-accent-3)">Emergency</h6>
-                <p class="small text-muted mb-1">Bangladesh</p>
-                <p class="mb-1"><strong>999</strong> National</p>
-                <p class="mb-0"><strong>199</strong> Health</p>
-            </div>
-            {% if contacts %}
-            <div class="bx-chat-chip-wrap">
-                <h6>Contacts</h6>
-                {% for c in contacts %}
-                <p class="small mb-2"><strong>{{ c.name }}</strong><br><a href="tel:{{ c.phone }}" class="text-decoration-none" style="color:var(--bx-accent)">{{ c.phone }}</a></p>
-                {% endfor %}
-            </div>
-            {% endif %}
-        </aside>
+  <div class="bx-chat-sidebar">
+    <div class="bx-chat-sidebar-logo">
+      <img src="{% static 'images/blobax1.png' %}" width="36" alt="">
+      <span>Blobax AI</span>
     </div>
+    <p class="bx-chat-sidebar-hint">Ask me about symptoms, medications, diet, or your health reports.</p>
+    <div class="bx-chat-topics">
+      <p class="bx-label">Quick topics</p>
+      <button type="button" class="bx-topic-chip" onclick="insertPrompt(this)">Check my symptoms</button>
+      <button type="button" class="bx-topic-chip" onclick="insertPrompt(this)">Explain my BMI result</button>
+      <button type="button" class="bx-topic-chip" onclick="insertPrompt(this)">What is HbA1c?</button>
+      <button type="button" class="bx-topic-chip" onclick="insertPrompt(this)">Heart disease warning signs</button>
+      <button type="button" class="bx-topic-chip" onclick="insertPrompt(this)">How to lower blood sugar?</button>
+    </div>
+    <a href="{% url 'emergency:clear_chat' %}" class="bx-btn bx-btn-outline bx-btn-sm mt-auto">
+      <i class="fas fa-trash-can me-2"></i>Clear chat
+    </a>
+  </div>
+
+  <div class="bx-chat-main">
+    <div class="bx-chat-messages" id="chat-messages">
+      {% if not messages_list %}
+      <div class="bx-chat-empty" id="chat-empty">
+        <img src="{% static 'images/blobax1.png' %}" width="72" class="bx-float-slow mb-3" alt="">
+        <h4>Hi, I'm Blobax!</h4>
+        <p>Your personal AI health companion. Ask me anything about your health.</p>
+      </div>
+      {% endif %}
+      {% for msg in messages_list %}
+      <div class="bx-msg bx-msg-user"><div class="bx-msg-bubble">{{ msg.message }}</div></div>
+      <div class="bx-msg bx-msg-bot">
+        <img src="{% static 'images/blobax1.png' %}" class="bx-msg-avatar" width="28" alt="">
+        <div class="bx-msg-bubble">{{ msg.response|linebreaksbr }}</div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <form class="bx-chat-input-bar" id="chat-form" autocomplete="off">
+      {% csrf_token %}
+      <input type="text" name="message" id="chat-input"
+             class="bx-chat-input" placeholder="Ask Blobax anything..." autocomplete="off" required>
+      <button type="submit" class="bx-chat-send" id="chat-send-btn">
+        <i class="fas fa-arrow-up"></i>
+      </button>
+    </form>
+  </div>
+
 </div>
-{% endblock %}
 
-{% block scripts %}
 <script>
-(function() {
-    const chatUrl = "{% url 'emergency:chatbot_api' %}";
-    const clearUrl = "{% url 'emergency:clear_chat' %}";
-    let sessionId = 'user_{{ request.user.id }}_' + Date.now();
-    const messagesEl = document.getElementById('chat-messages');
-    const inputEl = document.getElementById('chat-input');
-    const botImg = "{% static 'images/blobax1.png' %}";
-    const userInitial = "{{ request.user.username|first|upper }}";
+function insertPrompt(btn) {
+  document.getElementById('chat-input').value = btn.textContent;
+  document.getElementById('chat-input').focus();
+}
 
-    function scrollBottom() {
-        messagesEl.scrollTop = messagesEl.scrollHeight;
-    }
+function scrollChatBottom() {
+  const msgs = document.getElementById('chat-messages');
+  if (msgs) msgs.scrollTop = msgs.scrollHeight;
+}
 
-    function addMsg(text, isUser) {
-        const row = document.createElement('div');
-        row.className = 'bx-chat-msg ' + (isUser ? 'user' : 'bot');
-        const safe = BlobaxChat.formatMessage(text);
-        if (isUser) {
-            row.innerHTML = '<div class="bx-chat-av">' + userInitial + '</div><div><div class="bx-chat-bubble">' + safe + '</div></div>';
-        } else {
-            row.innerHTML = '<img src="' + botImg + '" class="bx-chat-av" alt=""><div><div class="bx-chat-bubble">' + safe + '</div></div>';
-        }
-        messagesEl.appendChild(row);
-        scrollBottom();
-    }
+function appendMessage(text, isUser) {
+  const empty = document.getElementById('chat-empty');
+  if (empty) empty.remove();
+  const msgs = document.getElementById('chat-messages');
+  const wrap = document.createElement('div');
+  wrap.className = isUser ? 'bx-msg bx-msg-user' : 'bx-msg bx-msg-bot';
+  if (!isUser) {
+    wrap.innerHTML = '<img src="{% static "images/blobax1.png" %}" class="bx-msg-avatar" width="28" alt="">';
+  }
+  const bubble = document.createElement('div');
+  bubble.className = 'bx-msg-bubble';
+  bubble.textContent = text;
+  wrap.appendChild(bubble);
+  msgs.appendChild(wrap);
+  scrollChatBottom();
+}
 
-    function showTyping() {
-        const el = document.createElement('div');
-        el.className = 'bx-chat-msg bot bx-chat-typing';
-        el.id = 'bx-typing';
-        el.innerHTML = '<div class="bx-chat-av"></div><div class="bx-chat-bubble"><span></span><span></span><span></span></div>';
-        messagesEl.appendChild(el);
-        scrollBottom();
-    }
+function escapeHtml(s) {
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
 
-    function hideTyping() {
-        document.getElementById('bx-typing')?.remove();
-    }
+document.getElementById('chat-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const input = document.getElementById('chat-input');
+  const btn = document.getElementById('chat-send-btn');
+  const text = input.value.trim();
+  if (!text) return;
 
-    async function sendMessage() {
-        const text = inputEl.value.trim();
-        if (!text) return;
-        inputEl.value = '';
-        addMsg(text, true);
-        showTyping();
-        try {
-            const res = await fetch(chatUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': BlobaxChat.getCsrf() },
-                body: JSON.stringify({ message: text, session_id: sessionId }),
-            });
-            const data = await res.json();
-            hideTyping();
-            if (data.response) addMsg(data.response, false);
-            else if (data.error) addMsg(data.error, false);
-        } catch (e) {
-            hideTyping();
-            addMsg("Connection issue — please try again.", false);
-        }
-    }
+  appendMessage(text, true);
+  input.value = '';
+  input.disabled = true;
+  btn.disabled = true;
 
-    document.getElementById('send-btn').addEventListener('click', sendMessage);
-    inputEl.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } });
+  const thinking = document.createElement('div');
+  thinking.className = 'bx-msg bx-msg-bot bx-msg-thinking';
+  thinking.innerHTML = '<img src="{% static "images/blobax1.png" %}" class="bx-msg-avatar" width="28" alt=""><div class="bx-msg-bubble">Thinking…</div>';
+  document.getElementById('chat-messages').appendChild(thinking);
+  scrollChatBottom();
 
-    document.querySelectorAll('.emergency-topic').forEach((btn) => {
-        btn.addEventListener('click', () => {
-            inputEl.value = btn.dataset.topic || btn.textContent.trim();
-            sendMessage();
-        });
+  try {
+    const res = await fetch('{% url "emergency:chatbot_api" %}', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': document.cookie.match(/csrftoken=([^;]+)/)?.[1] || '',
+      },
+      body: JSON.stringify({ message: text }),
     });
+    thinking.remove();
+    const data = await res.json();
+    if (data.response) {
+      const botWrap = document.createElement('div');
+      botWrap.className = 'bx-msg bx-msg-bot';
+      botWrap.innerHTML = '<img src="{% static "images/blobax1.png" %}" class="bx-msg-avatar" width="28" alt=""><div class="bx-msg-bubble"></div>';
+      botWrap.querySelector('.bx-msg-bubble').innerHTML = escapeHtml(data.response).replace(/\n/g, '<br>');
+      document.getElementById('chat-messages').appendChild(botWrap);
+    } else {
+      appendMessage(data.error || 'Something went wrong.', false);
+    }
+  } catch (err) {
+    thinking.remove();
+    appendMessage('Network error. Please try again.', false);
+  }
 
-    document.getElementById('clear-chat-btn').addEventListener('click', async () => {
-        if (!confirm('Clear all chat messages?')) return;
-        await fetch(clearUrl, { method: 'POST', headers: { 'X-CSRFToken': BlobaxChat.getCsrf() } });
-        messagesEl.innerHTML = '';
-        addMsg("Chat cleared. How can I help you today?", false);
-    });
+  input.disabled = false;
+  btn.disabled = false;
+  input.focus();
+  scrollChatBottom();
+});
 
-    scrollBottom();
-})();
+scrollChatBottom();
 </script>
 {% endblock %}

@@ -47,8 +47,8 @@
     z-index: 1;
     pointer-events: none;
     background-image:
-        linear-gradient(rgba(0, 240, 255, 0.05) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0, 240, 255, 0.05) 1px, transparent 1px);
+        linear-gradient(rgba(0, 212, 170, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 212, 170, 0.05) 1px, transparent 1px);
     background-size: 48px 48px;
     mask-image: radial-gradient(ellipse 85% 70% at 40% 45%, black 20%, transparent 100%);
 }
@@ -78,22 +78,22 @@
 }
 
 .bx-hero-vid-eyebrow {
-    font-size: 0.68rem;
+    font-size: clamp(0.72rem, 1.2vw, 0.85rem);
     letter-spacing: 0.22em;
     text-transform: uppercase;
     color: var(--bx-accent);
-    margin-bottom: 0.85rem;
+    margin-bottom: 1rem;
 }
 
 .bx-hero-vid-title {
     font-family: var(--bx-font-display);
-    font-size: clamp(1.5rem, 4vw, 2.75rem);
+    font-size: clamp(2.65rem, 6vw, 5.75rem);
     font-weight: 700;
-    line-height: 1.15;
+    line-height: 1.12;
     letter-spacing: -0.025em;
     color: #fff;
-    max-width: 22ch;
-    margin: 0;
+    max-width: 18ch;
+    margin: 0 0 0.35rem;
 }
 
 .bx-hero-vid-title em {
@@ -107,13 +107,13 @@
 }
 
 .bx-hero-vid-actions {
-    margin-top: 1.25rem !important;
-    gap: 0.75rem !important;
+    margin-top: 1.5rem !important;
+    gap: 0.85rem !important;
 }
 
 .bx-hero-vid-actions .bx-btn {
-    padding: 0.55rem 1.25rem;
-    font-size: 0.9rem;
+    padding: 0.65rem 1.45rem;
+    font-size: 0.98rem;
 }
 
 .bx-hero-vid-bottom {
@@ -127,11 +127,11 @@
 }
 
 .bx-hero-vid-desc {
-    max-width: 360px;
-    color: var(--bx-muted);
-    font-size: 0.88rem;
-    line-height: 1.6;
-    margin: 0;
+    max-width: 34rem;
+    color: rgba(226, 232, 240, 0.92);
+    font-size: clamp(0.95rem, 1.35vw, 1.12rem);
+    line-height: 1.65;
+    margin: 0 0 0.25rem;
 }
 
 .bx-hero-vid-progress .bar {
@@ -183,7 +183,10 @@
         padding: 5.5rem 1.5rem 2rem;
     }
     .bx-hero-vid-title {
-        max-width: 26ch;
+        max-width: 20ch;
+    }
+    .bx-hero-vid-desc {
+        max-width: 36rem;
     }
 }
 

@@ -1,29 +1,20 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Q
 import json
 from .models import ChatMessage, EmergencyContact, Doctor
-from .gemini_service import gemini_service
+from .gemini_service import gemini_service, get_gemini_response
 import uuid
 import time
 
 @login_required
 def home(request):
-    """Fast homepage with minimal database queries"""
-    contacts = EmergencyContact.objects.all()[:6]  # Limit contacts for speed
-    recent_messages = ChatMessage.objects.filter(user=request.user).order_by('-timestamp')[:5]  # Limit messages
-    
-    gemini_status = "✅ Online" if gemini_service.setup_complete else "🔧 Basic Mode"
-    model_info = getattr(gemini_service, 'model_name', 'Unknown')
-    
+    """Blobax AI chat — messages sent via AJAX (chatbot_api)."""
+    messages_list = ChatMessage.objects.filter(user=request.user).order_by('timestamp')
     return render(request, 'emergency/home.html', {
-        'contacts': contacts,
-        'recent_messages': reversed(list(recent_messages)),
-        'gemini_status': gemini_status,
-        'response_time': '⚡ Ultra Fast',
-        'model_info': model_info
+        'messages_list': messages_list,
     })
 
 @login_required
@@ -42,7 +33,13 @@ def chatbot_api(request):
                 return JsonResponse({'error': 'Empty message'}, status=400)
             
             # Get Blobax response (with potential timeout in service)
-            blobax_response = gemini_service.chat(user_message)
+            history = list(
+                ChatMessage.objects.filter(user=request.user)
+                .order_by('-timestamp')[:6]
+                .values('message', 'response')
+            )
+            history = [{'user': h['message'], 'bot': h['response']} for h in reversed(history)]
+            blobax_response = get_gemini_response(user_message, history=history)
             
             ChatMessage.objects.create(
                 user=request.user,
@@ -96,25 +93,12 @@ def get_chat_history(request):
     return JsonResponse({'messages': chat_data})
 
 @login_required
-@csrf_exempt
 def clear_chat(request):
-    """Clear all chat messages for the user"""
+    """Clear all chat messages for the user."""
+    ChatMessage.objects.filter(user=request.user).delete()
     if request.method == 'POST':
-        try:
-            # Delete all messages for this user
-            deleted_count = ChatMessage.objects.filter(user=request.user).delete()[0]
-            return JsonResponse({
-                'success': True,
-                'message': f'Cleared {deleted_count} messages',
-                'deleted_count': deleted_count
-            })
-        except Exception as e:
-            return JsonResponse({
-                'success': False,
-                'error': str(e)
-            }, status=500)
-    
-    return JsonResponse({'error': 'Invalid request'}, status=400)
+        return JsonResponse({'success': True})
+    return redirect('emergency:home')
 
 @login_required
 def emergency_directory(request):

@@ -8,15 +8,17 @@
 <div class="container">
 
   <div class="bx-profile-header bx-reveal">
-    <div class="bx-avatar-wrap">
-      {% if profile.avatar %}
-        <img src="{{ profile.avatar.url }}" class="bx-avatar" alt="Avatar">
-      {% else %}
-        <div class="bx-avatar-initials">
-          {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}{% if not user.first_name %}{{ user.username|first|upper }}{% endif %}
-        </div>
-      {% endif %}
-      <span class="bx-avatar-edit" title="Change photo in Edit Profile tab"><i class="fas fa-camera"></i></span>
+    <div class="bx-avatar-ring-wrap">
+      <div class="bx-avatar-wrap">
+        {% if profile.avatar %}
+          <img src="{{ profile.avatar.url }}" class="bx-avatar" alt="Avatar">
+        {% else %}
+          <div class="bx-avatar-initials">
+            {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}{% if not user.first_name %}{{ user.username|first|upper }}{% endif %}
+          </div>
+        {% endif %}
+        <span class="bx-avatar-edit" title="Change photo in Edit Profile tab"><i class="fas fa-camera"></i></span>
+      </div>
     </div>
     <div class="bx-profile-meta">
       <h1 class="bx-title h3">{{ user.get_full_name|default:user.username }}</h1>
@@ -42,6 +44,21 @@
   </div>
 
   <div class="bx-tab-content active" id="tab-overview">
+    <div class="bx-health-score-card bx-reveal mb-4">
+      <div class="bx-score-ring">
+        <svg viewBox="0 0 100 100" width="120">
+          <circle cx="50" cy="50" r="40" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="10"/>
+          <circle cx="50" cy="50" r="40" fill="none" stroke="var(--bx-accent)" stroke-width="10"
+                  stroke-dasharray="{% if health_score %}{{ health_score|floatformat:0 }} 251{% else %}0 251{% endif %}"
+                  stroke-linecap="round" transform="rotate(-90 50 50)"/>
+        </svg>
+        <div class="bx-score-num">{% if health_score is not None %}{{ health_score }}{% else %}—{% endif %}</div>
+      </div>
+      <div>
+        <h6 class="fw-bold">Health Score</h6>
+        <p class="bx-muted-text small mb-0">Based on your prediction history. Run more checks to improve accuracy.</p>
+      </div>
+    </div>
     <div class="row g-4">
       <div class="col-md-4">
         <div class="bx-card h-100">
@@ -241,6 +258,11 @@
 
 </div>
 </section>
+
+<button type="button" class="bx-fab" id="fab-vital" title="Log a vital"
+  onclick="document.querySelector('[data-tab=vitals]').click();document.getElementById('tab-vitals').scrollIntoView({behavior:'smooth'})">
+  <i class="fas fa-plus"></i>
+</button>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 <script>

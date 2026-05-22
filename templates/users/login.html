@@ -1,49 +1,75 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load socialaccount %}
-
-{% block title %}Sign in — Blobax{% endblock %}
-
+{% block body_class %}bx-page-auth{% endblock %}
 {% block content %}
-<div class="bx-auth-wrap">
-    <div class="bx-auth-stars" aria-hidden="true"></div>
-    <div class="bx-auth-brand">
-        <img src="{% static 'images/blobax2.png' %}" alt="" width="72" class="mb-3 bx-float-slow" onerror="this.style.display='none'">
-        <h2>Welcome back</h2>
-        <p class="opacity-75 mb-0">Sign in with Google or your email to access predictions, assistant, and your health dashboard.</p>
+<div class="bx-auth-shell">
+
+  <div class="bx-auth-panel d-none d-lg-flex">
+    <div class="bx-auth-panel-bg"></div>
+    <div class="bx-auth-panel-content">
+      <img src="{% static 'images/blobax1.png' %}" class="bx-float-anim mb-4" width="140" alt="Blobax">
+      <h2>Health intelligence<br>that works for you.</h2>
+      <p class="bx-muted-text mt-2">Run AI predictions, track vitals, find doctors, all in one place.</p>
+      <div class="bx-auth-features mt-4">
+        <div class="bx-auth-feat"><i class="fas fa-brain" style="color:var(--bx-accent)"></i> Diabetes, Heart &amp; Liver AI</div>
+        <div class="bx-auth-feat"><i class="fas fa-chart-line" style="color:#6366f1"></i> Personal Health Tracking</div>
+        <div class="bx-auth-feat"><i class="fas fa-stethoscope" style="color:#f43f5e"></i> Bangladesh Doctor Directory</div>
+      </div>
     </div>
-    <div class="bx-auth-form-panel">
-        <div class="bx-auth-card">
-            <h3 class="fw-bold mb-1">Sign in</h3>
+  </div>
 
-            <a href="{% provider_login_url 'google' %}" class="bx-btn bx-btn-google w-100 mb-3">
-                <svg width="18" height="18" viewBox="0 0 18 18" class="me-2" aria-hidden="true">
-                    <path fill="#4285F4" d="M16.51 8H8.98v3h4.3c-.18 1-.74 1.48-1.6 2.04v2.01h2.6a7.8 7.8 0 0 0 2.38-5.88c0-.57-.05-.66-.15-1.18z"/>
-                    <path fill="#34A853" d="M8.98 17c2.16 0 3.97-.72 5.3-1.94l-2.6-2a4.8 4.8 0 0 1-7.18-2.54H1.83v2.07A8 8 0 0 0 8.98 17z"/>
-                    <path fill="#FBBC05" d="M4.5 10.52a4.8 4.8 0 0 1 0-3.04V5.41H1.83a8 8 0 0 0 0 7.18l2.67-2.07z"/>
-                    <path fill="#EA4335" d="M8.98 4.18c1.17 0 2.23.4 3.06 1.2l2.3-2.3A8 8 0 0 0 1.83 5.4L4.5 7.49a4.77 4.77 0 0 1 4.48-3.3z"/>
-                </svg>
-                Continue with Google
-            </a>
+  <div class="bx-auth-form-side">
+    <div class="bx-auth-form-wrap">
+      <div class="mb-4">
+        <a href="{% url 'home' %}" class="bx-back-link"><i class="fas fa-arrow-left me-2"></i>Back</a>
+        <h1 class="bx-title h3 mt-3 mb-1">Welcome back</h1>
+        <p class="bx-muted-text">Sign in to your Blobax account</p>
+      </div>
 
-            <div class="bx-divider"><span>or sign in with email</span></div>
+      {% if messages %}{% for m in messages %}<div class="alert alert-{{ m.tags }} mb-3">{{ m }}</div>{% endfor %}{% endif %}
 
-            <form method="post" action="{% url 'users:login' %}">
-                {% csrf_token %}
-                <div class="mb-3">
-                    <label class="bx-label">Username</label>
-                    <input type="text" name="username" class="bx-input" placeholder="Enter username" required autofocus>
-                </div>
-                <div class="mb-4">
-                    <label class="bx-label">Password</label>
-                    <input type="password" name="password" class="bx-input" placeholder="Enter password" required>
-                </div>
-                <button type="submit" class="bx-btn bx-btn-primary w-100">Sign in</button>
-            </form>
-            <p class="text-center text-muted small mt-4 mb-0">
-                New here? <a href="{% url 'users:register' %}" class="fw-semibold" style="color:var(--bx-accent)">Create account</a>
-            </p>
+      <a href="{% provider_login_url 'google' %}" class="bx-btn-google w-100 mb-3">
+        <svg width="18" height="18" viewBox="0 0 18 18" class="me-2" aria-hidden="true">
+          <path fill="#4285F4" d="M16.51 8H8.98v3h4.3c-.18 1-.74 1.48-1.6 2.04v2.01h2.6a7.8 7.8 0 0 0 2.38-5.88c0-.57-.05-.66-.15-1.18z"/>
+          <path fill="#34A853" d="M8.98 17c2.16 0 3.97-.72 5.3-1.94l-2.6-2a4.8 4.8 0 0 1-7.18-2.54H1.83v2.07A8 8 0 0 0 8.98 17z"/>
+          <path fill="#FBBC05" d="M4.5 10.52a4.8 4.8 0 0 1 0-3.04V5.41H1.83a8 8 0 0 0 0 7.18l2.67-2.07z"/>
+          <path fill="#EA4335" d="M8.98 4.18c1.17 0 2.23.4 3.06 1.2l2.3-2.3A8 8 0 0 0 1.83 5.4L4.5 7.49a4.77 4.77 0 0 1 4.48-3.3z"/>
+        </svg>
+        Continue with Google
+      </a>
+
+      <div class="bx-divider"><span>or</span></div>
+
+      <form method="post" action="{% url 'users:login' %}">
+        {% csrf_token %}
+        <div class="mb-3">
+          <label class="bx-label">Username or Email</label>
+          <input type="text" name="username" class="bx-input" placeholder="Enter your username" required autofocus>
         </div>
+        <div class="mb-4">
+          <label class="bx-label">Password</label>
+          <div class="bx-input-wrap">
+            <input type="password" name="password" id="pw" class="bx-input" placeholder="Enter your password" required>
+            <button type="button" class="bx-pw-toggle" onclick="togglePw()"><i class="fas fa-eye" id="pw-icon"></i></button>
+          </div>
+        </div>
+        <button type="submit" class="bx-btn bx-btn-primary w-100">Sign In</button>
+      </form>
+
+      <p class="text-center mt-3 bx-muted-text" style="font-size:0.875rem">
+        No account? <a href="{% url 'users:register' %}" style="color:var(--bx-accent)">Create one free</a>
+      </p>
     </div>
+  </div>
+
 </div>
+<script>
+function togglePw() {
+  const pw = document.getElementById('pw');
+  const ic = document.getElementById('pw-icon');
+  pw.type = pw.type === 'password' ? 'text' : 'password';
+  ic.className = pw.type === 'password' ? 'fas fa-eye' : 'fas fa-eye-slash';
+}
+</script>
 {% endblock %}

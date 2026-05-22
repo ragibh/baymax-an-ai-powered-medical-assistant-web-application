@@ -93,7 +93,7 @@
 .bx-dir-pill.active {
     border-color: var(--bx-accent);
     color: var(--bx-accent);
-    background: rgba(0, 240, 255, 0.08);
+    background: rgba(0, 212, 170, 0.08);
 }
 
 .bx-dir-grid {
@@ -115,7 +115,7 @@
 
 .bx-dir-card:hover {
     transform: translateY(-4px);
-    border-color: rgba(0, 240, 255, 0.35);
+    border-color: rgba(0, 212, 170, 0.35);
     box-shadow: var(--bx-glow);
 }
 
@@ -129,7 +129,7 @@
     width: 48px;
     height: 48px;
     border-radius: 12px;
-    background: linear-gradient(135deg, rgba(0, 240, 255, 0.15), rgba(124, 58, 237, 0.2));
+    background: linear-gradient(135deg, rgba(0, 212, 170, 0.15), rgba(124, 58, 237, 0.2));
     border: 1px solid var(--bx-border);
     display: flex;
     align-items: center;

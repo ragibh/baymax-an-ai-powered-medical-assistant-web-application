@@ -73,6 +73,13 @@ def profile(request):
     donations = BloodDonationHistory.objects.filter(user=request.user)
     ml_predictions = Prediction.objects.filter(user=request.user).order_by('-created_at')[:50]
 
+    preds = list(Prediction.objects.filter(user=request.user))
+    if preds:
+        clean = sum(1 for p in preds if 'No' in p.result or 'no' in p.result.lower() or 'Normal' in p.result)
+        health_score = round((clean / len(preds)) * 100)
+    else:
+        health_score = None
+
     chart_data = {}
     for vt, _label in VITAL_CHART_KEYS:
         records = list(
@@ -92,6 +99,7 @@ def profile(request):
         'vital_types': HealthVital.VITAL_TYPES,
         'vital_chart_keys': VITAL_CHART_KEYS,
         'ml_predictions': ml_predictions,
+        'health_score': health_score,
     })
 
 
